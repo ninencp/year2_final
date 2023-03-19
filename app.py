@@ -144,6 +144,7 @@ def Login():
             # Create session data to access in other route
             session['loggedin'] = True
             session['teacher'] = True
+            session['teacher_id'] = teacher['teacher_id']
             session['username'] = teacher['username']
             session['teacher_name'] = teacher['teacher_name']
             # Redirect to index page
@@ -162,19 +163,46 @@ def THome():
     if 'loggedin' in session and 'teacher' in session:
         cursor.execute("SELECT * from subject")
         subject = cursor.fetchall()
-        return render_template("/teacher/index.html", teacher_name=session['teacher_name'], username=session['username'], subject=subject)
+        return render_template("/teacher/index.html", teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for(Login))
 
-@app.route("/teacher/edit/<id>")
+@app.route("/teacher/edit/<id>", methods=['GET','POST'])
 def GetUser(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
     data = cursor.fetchall()
     print(data[0])
-    render_template("/teacher/edit.html", user=data[0])
+    return render_template("/teacher/edit.html", user=data[0])
     
+@app.route("/teacher/update/<id>", methods=['POST'])
+def Update(id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
 
+    if request.method == 'POST' and 'username' in request.form and 'teacher_name' in request.form:
+        name = request.form['teacher_name']
+        username = request.form['username']
+        cursor.execute("\
+                    UPDATE teacher\
+                    SET teacher_name = %s,\
+                        username = %s\
+                    WHERE teacher_id = %s\
+                    ", (name, username, id))
+        db.commit()
+        return redirect(url_for('Login'))
+    elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
+        password = request.form['password']
+        conf_pw = request.form['conf_pw']
+        cursor.execute("\
+                    UPDATE teacher\
+                    SET password = %s,\
+                        conf_password = %s\
+                    WHERE teacher_id = %s\
+                    ", (password, conf_pw, id))
+        db.commit()
+        return redirect(url_for('Login'))
+     
 # start app
 if __name__ == "__main__":
     app.run(port=4000, debug=True)

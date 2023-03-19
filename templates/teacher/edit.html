@@ -46,9 +46,9 @@
                     <div class="sb-sidenav-menu-heading">เมนูหลัก</div>
                     <a class="nav-link" href="{{url_for('THome')}}">
                         <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                        <span>{{teacher_name}}</span>
+                        <span>{{user.teacher_name}}</span>
                     </a>
-                    <a class="nav-link disabled" href="#" style="color: white;">
+                    <a class="nav-link disabled" href="/teacher/edit/{{teacher_id}}" style="color: white;">
                         <div class="sb-nav-link-icon" style="color: white;"><i class="fa-solid fa-address-card"></i></div>
                         <span>แก้ไขข้อมูลส่วนตัว</span>
                     </a>
@@ -66,50 +66,40 @@
             <div class="card" style="margin-top: 2%;">
                 <div class="card-header"><h3>แก้ไขข้อมูลส่วนตัว</h3></div>
                 <div class="card-body">
-                    <div class="row row-cols-auto">
-                        <div class="col">
-                            <h5><i class="fa fa-user" style="color: rgb(12, 124, 189);"></i> สวัสดีอาจารย์ {{teacher_name}}</h5>
+                    <form action="/teacher/update/{{user.teacher_id}}" method="post">
+                        <div class="form-outline mb-4">
+                            <input type="text" id="username" class="form-control form-control-lg" name="username" />
+                            <label class="form-label" for="username">ชื่อผู้ใช้ : {{user.username}}</label>
                         </div>
-                    </div>
+                        <div class="form-outline mb-4">
+                            <input type="text" id="teacher_name" class="form-control form-control-lg" name="teacher_name" />
+                            <label class="form-label" for="teacher_name">ชื่อ : {{user.teacher_name}}</label>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit"
+                              class="btn btn-success btn-lg gradient-custom-4 text-body" style="font-family: 'Prompt'; font-weight: bold;">แก้ไขข้อมูล</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <br>
-            <div class="card">
-                <div class="card-header">
-                    <div class="row row-cols-auto">
-                        <div class="col"><h4>รายวิชาที่สอน</h4></div>
-                        <div class="col">
-                            <button type="button" class="btn btn-primary btn-sm">+ เพิ่มรายวิชา</button>
-                        </div>
-                    </div>
-                    
-                </div>
+            <div class="card" style="margin-top: 2%;">
+                <div class="card-header"><h3>เปลี่ยนรหัสผ่าน</h3></div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
-                                <thead>
-                                    <tr class="table-info">
-                                        <th width="5%">รหัสวิชา</th>
-                                        <th width="55%">รายวิชา</th>
-                                        <th width="10%">จำนวนนิสิต</th>
-                                        <th width="10%">เข้าเรียน</th>
-                                        <th width="10%">ประวัติการเข้าเรียน</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for subject in subject %}
-                                    <tr>
-                                        <td>{{subject.s_id}}</td>
-                                        <td>{{subject.s_name}}</td>
-                                        <td>no</td>
-                                        <td>no</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                    <form action="/teacher/update/{{user.teacher_id}}" method="post">
+                        <div class="form-outline mb-4">
+                            <input type="password" id="password" class="form-control form-control-lg" name="password" />
+                            <label class="form-label" for="password">รหัสผ่านใหม่</label>
                         </div>
-                    </div>
+                        <div class="form-outline mb-4">
+                            <input type="password" id="conf_pw" class="form-control form-control-lg" name="conf_pw" />
+                            <label class="form-label" for="conf_pw">ยืนยันรหัสผ่าน</label>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit"
+                              class="btn btn-success btn-lg gradient-custom-4 text-body" style="font-family: 'Prompt'; font-weight: bold;">เปลี่ยนรหัสผ่าน</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
