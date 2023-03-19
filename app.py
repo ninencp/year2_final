@@ -276,6 +276,55 @@ def StdHome():
         return render_template("/student/index.html", std_id=session['std_id'], std_name=session['std_name'], username=session['username'], enroll=enroll)
     return redirect(url_for('Login'))    
 
+@app.route("/student/edit/<id>", methods=['GET','POST'])
+def GetStd(id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    if 'loggedin' in session and 'std' in session:
+        cursor.execute("SELECT * FROM student WHERE std_id = %s", (id))
+        session['data'] = cursor.fetchall()
+        data = session['data']
+        print(data[0])
+        return render_template("/student/edit.html", user=data[0])
+    return redirect(url_for('Login'))
+    
+@app.route("/student/update/<id>", methods=['POST'])
+def UpdateStd(id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    msg = ''
+    data = session['data']
+
+    if 'loggedin' in session and 'std' in session:
+        if request.method == 'POST' and 'username' in request.form and 'std_name' in request.form and 'std_id' in request.form:
+            name = request.form['std_name']
+            username = request.form['username']
+            cursor.execute("\
+                        UPDATE teacher\
+                        SET std_name = %s,\
+                            username = %s\
+                        WHERE std_id = %s\
+                        ", (name, username, id))
+            db.commit()
+            return redirect(url_for('Login'))
+        elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
+            password = request.form['password']
+            conf_pw = request.form['conf_pw']
+
+            if password == conf_pw:
+                cursor.execute("\
+                            UPDATE teacher\
+                            SET password = %s,\
+                                conf_password = %s\
+                            WHERE teacher_id = %s\
+                            ", (password, conf_pw, id))
+                db.commit()
+                return redirect(url_for('Login'))
+            else:
+                msg = 'Password did not match'
+                return render_template("/teacher/edit.html", msg=msg, user=data[0])
+    return redirect(url_for('Login'))
+
 # start app
 if __name__ == "__main__":
     app.run(port=4000, debug=True)

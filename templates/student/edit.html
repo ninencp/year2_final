@@ -46,7 +46,7 @@
                     <div class="sb-sidenav-menu-heading">เมนูหลัก</div>
                     <a class="nav-link" href="{{url_for('THome')}}">
                         <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                        <span>{{user.teacher_name}}</span>
+                        <span>{{user.std_name}}</span>
                     </a>
                     <a class="nav-link disabled" href="/teacher/edit/{{teacher_id}}" style="color: white;">
                         <div class="sb-nav-link-icon" style="color: white;"><i class="fa-solid fa-address-card"></i></div>
@@ -72,12 +72,12 @@
                             <label class="form-label" for="username">ชื่อผู้ใช้ : {{user.username}}</label>
                         </div>
                         <div class="form-outline mb-4">
-                            <input type="text" id="teacher_name" class="form-control form-control-lg" name="teacher_name" />
-                            <label class="form-label" for="teacher_name">ชื่อ : {{user.std_name}}</label>
+                            <input type="text" id="std_name" class="form-control form-control-lg" name="std_name" />
+                            <label class="form-label" for="std_name">ชื่อ : {{user.std_name}}</label>
                         </div>
                         <div class="form-outline mb-4">
-                            <input type="text" id="teacher_name" class="form-control form-control-lg" name="teacher_name" />
-                            <label class="form-label" for="teacher_name">รหัสนิสิต : {{user.std_id}}</label>
+                            <input type="text" id="std_id" class="form-control form-control-lg" name="std_id" />
+                            <label class="form-label" for="std_id">รหัสนิสิต : {{user.std_id}}</label>
                         </div>
                         <div class="d-flex justify-content-center">
                             <button type="submit"
