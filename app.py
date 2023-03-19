@@ -171,7 +171,8 @@ def GetUser(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
-    data = cursor.fetchall()
+    session['data'] = cursor.fetchall()
+    data = session['data']
     print(data[0])
     return render_template("/teacher/edit.html", user=data[0])
     
@@ -180,6 +181,7 @@ def Update(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     msg = ''
+    data = session['data']
 
     if request.method == 'POST' and 'username' in request.form and 'teacher_name' in request.form:
         name = request.form['teacher_name']
@@ -207,7 +209,7 @@ def Update(id):
             return redirect(url_for('Login'))
         else:
             msg = 'Password did not match'
-            return render_template("/teacher/edit.html", msg=msg)
+            return render_template("/teacher/edit.html", msg=msg, user=data[0])
      
 # start app
 if __name__ == "__main__":
