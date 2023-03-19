@@ -90,7 +90,7 @@
                             <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
                                 <thead>
                                     <tr class="table-info">
-                                        <th width="5%">ลำดับที่</th>
+                                        <th width="5%">รหัสวิชา</th>
                                         <th width="55%">รายวิชา</th>
                                         <th width="10%">จำนวนนิสิต</th>
                                         <th width="10%">เข้าเรียน</th>
@@ -98,7 +98,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
+                                    {% for subject in subject %}
+                                    <tr>
+                                        <td>{{subject.s_id}}</td>
+                                        <td>{{subject.s_name}}</td>
+                                        <td>no</td>
+                                        <td>no</td>
+                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
