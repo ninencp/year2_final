@@ -326,7 +326,7 @@ def UpdateStd(id):
     return redirect(url_for('Login'))
 
 @app.route("/student/enroll", methods=['GET','POST'])
-def Enroll():
+def EnrollPage():
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     msg = ''
@@ -334,30 +334,32 @@ def Enroll():
     std_id = session['std_id']
 
     if 'loggedin' in session and 'std' in session:
-        if request.method == 'POST' and 'subject_id' in request.form and 'subject' in request.form:
-            subject_id = request.form['subject_id']
-            subject = request.form['subject']
-            print(subject_id, subject, std_id)
+        cursor.execute("SELECT enroll.enroll_id, subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id inner join enroll on s_id=ref_s_id")
+        subject = cursor.fetchall()
+        # if request.method == 'POST' and 'subject_id' in request.form and 'subject' in request.form:
+        #     subject_id = request.form['subject_id']
+        #     subject = request.form['subject']
+        #     print(subject_id, subject, std_id)
 
-            cursor.execute("SELECT ref_s_id, subject.s_name FROM enroll INNER JOIN subject WHERE enroll.ref_s_id=subject.s_id")
-            subject_data = cursor.fetchall()
+        #     cursor.execute("SELECT ref_s_id, subject.s_name FROM enroll INNER JOIN subject WHERE enroll.ref_s_id=subject.s_id")
+        #     subject_data = cursor.fetchall()
 
-            for data in subject_data:
-                if data["ref_s_id"] == subject_id:
+        #     for data in subject_data:
+        #         if data["ref_s_id"] == subject_id:
 
-                    cursor.execute("SELECT * from enroll WHERE ref_s_id = %s AND ref_std_id = %s", (subject_id, std_id))
-                    enroll_check = cursor.fetchone()
+        #             cursor.execute("SELECT * from enroll WHERE ref_s_id = %s AND ref_std_id = %s", (subject_id, std_id))
+        #             enroll_check = cursor.fetchone()
 
-                    if enroll_check:
-                        msg='ลงทะเบียนรายวิชานี้แล้ว'
-                    else:
-                        cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
-                        db.commit()
-                        msg = 'ลงทะเบียนเรียบร้อย'
-                else:
-                    msg = 'ไม่มีรายวิชานี้'
-            return render_template("/student/enroll.html", msg=msg, user=data[0])
-        return render_template("/student/enroll.html", user=data[0])
+        #             if enroll_check:
+        #                 msg='ลงทะเบียนรายวิชานี้แล้ว'
+        #             else:
+        #                 cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
+        #                 db.commit()
+        #                 msg = 'ลงทะเบียนเรียบร้อย'
+        #         else:
+        #             msg = 'ไม่มีรายวิชานี้'
+        #     return render_template("/student/enroll.html", msg=msg, user=data[0])
+        return render_template("/student/enroll.html", user=data[0], subject=subject)
     return redirect(url_for('Login'))
 
 # start app

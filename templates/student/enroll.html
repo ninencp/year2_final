@@ -31,7 +31,7 @@
 <body class="sb-nav-fixed">
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="{{url_for('THome')}}">AAI Check !</a>
+    <a class="navbar-brand ps-3" href="{{url_for('StdHome')}}">AAI Check !</a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
     <!-- Navbar-->
@@ -66,19 +66,34 @@
             <div class="card" style="margin-top: 2%;">
                 <div class="card-header"><h3>:: ลงทะเบียนรายวิชา</h3></div>
                 <div class="card-body">
-                    <form action="{{url_for('Enroll')}}" method="post">
-                        <div class="form-outline mb-4">
-                            <input type="number" id="subject_id" class="form-control form-control-lg" name="subject_id" />
-                            <label class="form-label" for="subject_id">รหัสวิชา</label>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
+                                <thead>
+                                    <tr class="table-info">
+                                        <th>รหัสวิชา</th>
+                                        <th>รายวิชา</th>
+                                        <th>อาจารย์ผู้สอน</th>
+                                        <th>เริ่มเรียน</th>
+                                        <th>เลิกเรียน</th>
+                                        <th>ลงทะเบียน</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in subject %}
+                                    <tr>
+                                        <td>{{subject.s_id}}</td>
+                                        <td>{{subject.s_name}}</td>
+                                        <td>{{subject.teacher_name}}</td>
+                                        <td>{{subject.start_time}}</td>
+                                        <td>{{subject.end_time}}</td>
+                                        <td><a type="button" class="btn btn-primary btn-sm" href="/student/enroll/{{subject.enroll_id}}">+ ลงทะเบียน</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-
-                        <div class="d-flex justify-content-center">
-                            <button type="submit"
-                              class="btn btn-success text-body" style="font-family: 'Prompt'; font-weight: bold;">บันทึก</button>
-                            <a href="{{url_for('StdHome')}}" role="button" class="btn btn-danger text-body" style="margin-left: 2%;">ยกเลิก</a>
-                        </div>
-                        <br><div id="msg" style="color:brown; font-family: 'Prompt';">{{msg}}</div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
