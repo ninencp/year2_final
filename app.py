@@ -133,6 +133,7 @@ def Login():
         teacher = cursor.fetchone()
 
         if std:
+            print('student')
             # Create session data to access in other route
             session['loggedin'] = True
             session['std'] = True
@@ -140,8 +141,9 @@ def Login():
             session['std_name'] = std['std_name']
             session['username'] = std['username']
             # Redirect to index page
-            # return redirect((url_for('Index')))
+            return redirect((url_for('StdHome')))
         elif teacher:
+            print('teacher')
             # Create session data to access in other route
             session['loggedin'] = True
             session['teacher'] = True
@@ -158,7 +160,7 @@ def Login():
 # ---------------- teacher section ---------------- #
 
 @app.route("/teacher/logout")
-def Logout():
+def TLogout():
     # Remove session data. This will log user out.
     session.pop('loggedin', None)
     session.pop('teacher', None)
@@ -176,7 +178,7 @@ def THome():
         cursor.execute("SELECT * from subject")
         subject = cursor.fetchall()
         return render_template("/teacher/index.html", teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
-    return redirect(url_for(Login))
+    return redirect(url_for('Login'))
 
 @app.route("/teacher/edit/<id>", methods=['GET','POST'])
 def GetUser(id):
@@ -188,7 +190,7 @@ def GetUser(id):
         data = session['data']
         print(data[0])
         return render_template("/teacher/edit.html", user=data[0])
-    return redirect(url_for(Login))
+    return redirect(url_for('Login'))
     
 @app.route("/teacher/update/<id>", methods=['POST'])
 def Update(id):
@@ -225,7 +227,7 @@ def Update(id):
             else:
                 msg = 'Password did not match'
                 return render_template("/teacher/edit.html", msg=msg, user=data[0])
-    return redirect(url_for(Login))
+    return redirect(url_for('Login'))
      
 @app.route("/teacher/addsubject", methods=['GET','POST'])
 def AddSubject():
@@ -249,12 +251,12 @@ def AddSubject():
             msg = 'เพิ่มรายวิชาเรียบร้อย'
             return render_template("/teacher/addsubject.html", msg=msg, user=data[0])
         return render_template("/teacher/addsubject.html", user=data[0])
-    return redirect(url_for(Login))
+    return redirect(url_for('Login'))
 
 # ---------------- student section ---------------- #
 
 @app.route("/student/logout")
-def Logout():
+def StdLogout():
     # Remove session data. This will log user out.
     session.pop('loggedin', None)
     session.pop('std', None)
@@ -263,6 +265,16 @@ def Logout():
     session.pop('username', None)
     # Redirect to Login Page
     return redirect(url_for('Login'))
+
+@app.route("/student/home")
+def StdHome():
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    if 'loggedin' in session and 'std' in session:
+        cursor.execute("SELECT * from enroll")
+        enroll = cursor.fetchall()
+        return render_template("/student/index.html", std_id=session['std_id'], std_name=session['std_name'], username=session['username'], enroll=enroll)
+    return redirect(url_for('Login'))    
 
 # start app
 if __name__ == "__main__":

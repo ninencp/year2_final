@@ -46,9 +46,9 @@
                     <div class="sb-sidenav-menu-heading">เมนูหลัก</div>
                     <a class="nav-link disabled" href="{{url_for('THome')}}" style="color: white;">
                         <div class="sb-nav-link-icon" style="color: white;"><i class="fas fa-user"></i></div>
-                        <span>{{teacher_name}}</span>
+                        <span>{{std_name}}</span>
                     </a>
-                    <a class="nav-link" href="/teacher/edit/{{teacher_id}}">
+                    <a class="nav-link" href="#">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
                         <span>แก้ไขข้อมูลส่วนตัว</span>
                     </a>
@@ -79,7 +79,7 @@
                     <div class="row row-cols-auto">
                         <div class="col"><h4>รายวิชาที่ลงทะเบียน</h4></div>
                         <div class="col">
-                            <a type="button" class="btn btn-primary btn-sm" href="{{url_for('AddSubject')}}">+ ลงทะเบียน</a>
+                            <a type="button" class="btn btn-primary btn-sm" href="#">+ ลงทะเบียน</a>
                         </div>
                     </div>
                     
@@ -97,10 +97,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for subject in subject %}
+                                    {% for enroll in enroll %}
                                     <tr>
-                                        <td>{{subject.s_id}}</td>
-                                        <td>{{subject.s_name}}</td>
+                                        <td>{{enroll.ref_s_id}}</td>
+                                        <td>{{enroll.ref_std_id}}</td>
                                         <td>no</td>
                                         <td>no</td>
                                     </tr>
