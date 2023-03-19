@@ -48,7 +48,7 @@
                         <div class="sb-nav-link-icon" style="color: white;"><i class="fas fa-user"></i></div>
                         <span>{{user.teacher_name}}</span>
                     </a>
-                    <a class="nav-link" href="/teacher/edit/{{teacher_id}}">
+                    <a class="nav-link" href="/teacher/edit/{{user.teacher_id}}">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
                         <span>แก้ไขข้อมูลส่วนตัว</span>
                     </a>
@@ -66,9 +66,9 @@
             <div class="card" style="margin-top: 2%;">
                 <div class="card-header"><h3>:: เพิ่มรายวิชา</h3></div>
                 <div class="card-body">
-                    <form action="/teacher/update/{{user.teacher_id}}" method="post">
+                    <form action="{{url_for('AddSubject')}}" method="post">
                         <div class="form-outline mb-4">
-                            <input type="text" id="subject_id" class="form-control form-control-lg" name="subject_id" />
+                            <input type="number" id="subject_id" class="form-control form-control-lg" name="subject_id" />
                             <label class="form-label" for="subject_id">รหัสวิชา</label>
                         </div>
                         <div class="form-outline mb-4">
@@ -86,7 +86,7 @@
                         <div class="d-flex justify-content-center">
                             <button type="submit"
                               class="btn btn-success text-body" style="font-family: 'Prompt'; font-weight: bold;">บันทึก</button>
-                            <a href="{{url_for('AddSubject')}}" role="button" class="btn btn-danger text-body" style="margin-left: 10;">ยกเลิก</a>
+                            <a href="{{url_for('THome')}}" role="button" class="btn btn-danger text-body" style="margin-left: 2%;">ยกเลิก</a>
                         </div>
                         <br><div id="msg" style="color:brown; font-family: 'Prompt';">{{msg}}</div>
                     </form>

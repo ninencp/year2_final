@@ -29,14 +29,14 @@ mycursor = mydb.cursor()
 #                  conf_password varchar(50) NOT NULL\
 #                  )")
 
-# mycursor.execute("CREATE TABLE subject (\
-#                  s_id int NOT NULL PRIMARY KEY,\
-#                  s_name varchar(100),\
-#                  start_time datetime NOT NULL,\
-#                  end_time datetime NOT NULL,\
-#                  ref_teacher_id int NOT NULL COMMENT 'id อาจารย์',\
-#                  FOREIGN KEY (ref_teacher_id) REFERENCES teacher(teacher_id) \
-#                  )")
+mycursor.execute("CREATE TABLE subject (\
+                 s_id int NOT NULL PRIMARY KEY,\
+                 s_name varchar(100),\
+                 start_time varchar(10) NOT NULL,\
+                 end_time varchar(10) NOT NULL,\
+                 ref_teacher_id int NOT NULL COMMENT 'id อาจารย์',\
+                 FOREIGN KEY (ref_teacher_id) REFERENCES teacher(teacher_id) \
+                 )")
 
 # mycursor.execute("CREATE TABLE enroll (\
 #                  enroll_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,\

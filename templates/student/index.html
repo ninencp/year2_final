@@ -68,7 +68,7 @@
                 <div class="card-body">
                     <div class="row row-cols-auto">
                         <div class="col">
-                            <h5><i class="fa fa-user" style="color: rgb(12, 124, 189);"></i> สวัสดีอาจารย์ {{teacher_name}}</h5>
+                            <h5><i class="fa fa-user" style="color: rgb(12, 124, 189);"></i> {{std_id}} {{std_name}}</h5>
                         </div>
                     </div>
                 </div>
@@ -77,9 +77,9 @@
             <div class="card">
                 <div class="card-header">
                     <div class="row row-cols-auto">
-                        <div class="col"><h4>รายวิชาที่สอน</h4></div>
+                        <div class="col"><h4>รายวิชาที่ลงทะเบียน</h4></div>
                         <div class="col">
-                            <a type="button" class="btn btn-primary btn-sm" href="{{url_for('AddSubject')}}">+ เพิ่มรายวิชา</a>
+                            <a type="button" class="btn btn-primary btn-sm" href="{{url_for('AddSubject')}}">+ ลงทะเบียน</a>
                         </div>
                     </div>
                     
@@ -92,7 +92,6 @@
                                     <tr class="table-info">
                                         <th width="5%">รหัสวิชา</th>
                                         <th width="55%">รายวิชา</th>
-                                        <th width="10%">จำนวนนิสิต</th>
                                         <th width="10%">เข้าเรียน</th>
                                         <th width="10%">ประวัติการเข้าเรียน</th>
                                     </tr>
