@@ -165,6 +165,15 @@ def THome():
         return render_template("/teacher/index.html", teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for(Login))
 
+@app.route("/teacher/edit/<id>")
+def GetUser(id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
+    data = cursor.fetchall()
+    print(data[0])
+    
+
 # start app
 if __name__ == "__main__":
     app.run(port=4000, debug=True)
