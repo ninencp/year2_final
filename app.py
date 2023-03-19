@@ -172,7 +172,6 @@ def GetUser(id):
     cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
     data = cursor.fetchall()
     print(data[0])
-    
 
 # start app
 if __name__ == "__main__":
