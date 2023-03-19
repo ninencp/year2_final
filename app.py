@@ -339,12 +339,12 @@ def Enroll():
             subject = request.form['subject']
             print(subject_id, subject, std_id)
 
-            cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, subject))
+            cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
             db.commit()
 
             msg = 'ลงทะเบียนเรียบร้อย'
-            return render_template("/teacher/addsubject.html", msg=msg, user=data[0])
-        return render_template("/teacher/addsubject.html", user=data[0])
+            return render_template("/student/enroll.html", msg=msg, user=data[0])
+        return render_template("/student/enroll.html", user=data[0])
     return redirect(url_for('Login'))
 
 # start app
