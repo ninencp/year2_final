@@ -144,7 +144,7 @@ def Login():
 
 # ---------------- teacher section ---------------- #
 
-# @app.route("/teacher/index")
+# @app.route("/teacher/home")
 
 # start app
 if __name__ == "__main__":
