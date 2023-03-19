@@ -120,12 +120,12 @@ def Login():
     msg = ''
 
     # If "username" and "password" POST requests exist (user submitted form)
-    if request.method == "POST" and 'student_id' in request.form and 'pw' in request.form :
+    if request.method == "POST" and 'username' in request.form and 'pw' in request.form :
         # Create variable
-        student_id = request.form['student_id']
+        username = request.form['username']
         pw = request.form['pw']
         # Check if accounts exist in MySQL
-        cursor.execute("SELECT * FROM student WHERE student_id = %s AND password = %s", (student_id, pw))
+        cursor.execute("SELECT * FROM student WHERE username = %s AND password = %s", (username, pw))
         # Fetch one record
         account = cursor.fetchone()
         print(account)
@@ -133,7 +133,7 @@ def Login():
         if account:
             # Create session data to access in other route
             session['loggedin'] = True
-            session['student_id'] = account['student_id']
+            session['username'] = account['username']
             session['name'] = account['name']
             # Redirect to index page
             return redirect((url_for('Index')))
