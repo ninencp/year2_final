@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}Enroll{% endblock %}
+{% block title %}Detail{% endblock %}
 {% block body %}
 <!DOCTYPE html>
 <html lang="en">
@@ -64,36 +64,36 @@
     <div id="layoutSidenav_content">
         <div class="container-fluid">
             <div class="card" style="margin-top: 2%;">
-                <div class="card-header"><h3>:: ลงทะเบียนรายวิชา</h3></div>
+                <div class="card-header"><h3>:: ข้อมูลรายวิชา {{subject.s_id}} {{subject.s_name}}</h3></div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
-                                <thead>
-                                    <tr class="table-info">
-                                        <th>รหัสวิชา</th>
-                                        <th>รายวิชา</th>
-                                        <th>อาจารย์ผู้สอน</th>
-                                        <th>เริ่มเรียน</th>
-                                        <th>เลิกเรียน</th>
-                                        <th>ลงทะเบียน</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for subject in subject %}
-                                    <tr>
-                                        <td>{{subject.s_id}}</td>
-                                        <td>{{subject.s_name}}</td>
-                                        <td>{{subject.teacher_name}}</td>
-                                        <td>{{subject.start_time}}</td>
-                                        <td>{{subject.end_time}}</td>
-                                        <td><a type="button" class="btn btn-primary btn-sm" href="/student/enroll/{{subject.s_id}}">+ ลงทะเบียน</a></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                    <form action="/student/enroll/{{subject.s_id}}" method="post">
+                        <div class="form-outline mb-4">
+                            <input type="text" id="subject_id" class="form-control form-control-lg disabled" name="subject_id" value="{{subject.s_id}}" readonly />
+                            <label class="form-label" for="subject_id">รหัสวิชา</label>
                         </div>
-                    </div>
+                        <div class="form-outline mb-4">
+                            <input type="text" id="subject" class="form-control form-control-lg" name="subject" value="{{subject.s_name}}" readonly />
+                            <label class="form-label" for="subject">รายวิชา</label>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <input type="text" id="teacher" class="form-control form-control-lg" name="teacher" value="อาจารย์{{subject.teacher_name}}" readonly />
+                            <label class="form-label" for="teacher">อาจารย์ผู้สอน</label>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <input type="text" name="start" id="start" class="form-control form-control-lg" value="{{subject.start_time}}" readonly>
+                            <label for="start" class="form-label">เวลาเข้าเรียน</label>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <input type="text" name="end" id="end" class="form-control form-control-lg" value="{{subject.end_time}}" readonly>
+                            <label for="end" class="form-label">เวลาเลิกเรียน</label>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit"
+                              class="btn btn-success text-body" style="font-family: 'Prompt'; font-weight: bold;">ลงทะเบียน</button>
+                            <a href="{{url_for('EnrollPage')}}" role="button" class="btn btn-danger text-body" style="margin-left: 2%;">ยกเลิก</a>
+                        </div>
+                        <br><div id="msg" style="color:brown; font-family: 'Prompt';">{{msg}}</div>
+                    </form>
                 </div>
             </div>
         </div>

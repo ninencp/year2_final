@@ -332,10 +332,39 @@ def EnrollPage():
     data = session['data']
 
     if 'loggedin' in session and 'std' in session:
-        cursor.execute("SELECT enroll.enroll_id, subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id inner join enroll on s_id=ref_s_id")
+        cursor.execute("SELECT subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id")
         subject = cursor.fetchall()
+        print(subject)
         return render_template("/student/enroll.html", user=data[0], subject=subject)
-    return redirect(url_for('Login'))   
+    return redirect(url_for('Login'))
+
+@app.route('/student/enroll/<id>', methods=['GET','POST'])
+def Detail(id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    data = session['data']
+
+    if 'loggedin' in session and 'std' in session:
+        cursor.execute("SELECT subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id WHERE s_id = %s", (id))
+        subject = cursor.fetchone()
+        print(subject)
+        if request.method == 'POST' and 'subject_id' in request.form and 'subject' in request.form and 'start' in request.form and 'end' in request.form:
+            subject_id = request.form['subject_id']
+            std_id = session['std_id']
+            print(subject_id, std_id)
+            cursor.execute("SELECT * from enroll WHERE ref_s_id = %s AND ref_std_id = %s", (subject_id, std_id))
+            enroll_check = cursor.fetchone()
+
+            if enroll_check:
+                msg = 'คุณเคยลงทะเบียนรายวิชานี้ไปแล้ว'
+            else:
+                cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
+                db.commit()
+                msg = 'ลงทะเบียนเรียบร้อย'
+
+            return render_template("/student/detail.html", msg=msg, user=data[0], subject=subject)
+        return render_template("/student/detail.html", user=data[0], subject=subject)
+    return redirect(url_for('Login'))
 
 # start app
 if __name__ == "__main__":
