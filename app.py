@@ -40,14 +40,15 @@ def Register_std():
     msg = ''
 
     # if username & password POST request exist
-    if request.method == "POST" and 'pw' in request.form and 'conf_pw' in request.form and 'student_id' in request.form:
+    if request.method == "POST" and 'pw' in request.form and 'conf_pw' in request.form and 'student_id' in request.form and 'username' in request.form:
         # Create variable for easy access
         student_id = request.form['student_id']
+        username = request.form['username']
         password = request.form['pw']
         conf_pw = request.form['conf_pw']
         name = request.form['name']
 
-        print(student_id, password, name)
+        print(student_id, username, password, name)
 
         # Check if account exist in MySQL
         cursor.execute("SELECT * from student WHERE std_id = %s", (student_id,))
@@ -56,7 +57,7 @@ def Register_std():
 
         if account:
             msg = 'Account already exists'
-        elif not student_id or not name or not password:
+        elif not student_id or not username or not name or not password:
             msg = 'Please fill out the form'
         elif not re.match(r'[0-9]+', student_id):
             msg = 'Invalid student id'
@@ -64,7 +65,7 @@ def Register_std():
             msg = 'Password did not match'
         else:
             # Account does not exist
-            cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password) VALUES (%s, %s, %s, %s)", (student_id, name, password, conf_pw))
+            cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
             db.commit()
             msg = 'Successfully Registered'
 
