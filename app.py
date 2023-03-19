@@ -128,16 +128,24 @@ def Login():
         # Check if accounts exist in MySQL
         cursor.execute("SELECT * FROM student WHERE username = %s AND password = %s", (username, pw))
         # Fetch one record
-        account = cursor.fetchone()
-        print(account)
+        std = cursor.fetchone()
+        cursor.execute("SELECT * FROM teacher WHERE username = %s AND password = %s", (username, pw))
+        teacher = cursor.fetchone()
 
-        if account:
+        if std:
             # Create session data to access in other route
             session['loggedin'] = True
-            session['username'] = account['username']
-            session['name'] = account['name']
+            session['std_id'] = std['std_id']
+            session['name'] = std['std_name']
             # Redirect to index page
-            return redirect((url_for('Index')))
+            # return redirect((url_for('Index')))
+        elif teacher:
+            # Create session data to access in other route
+            session['loggedin'] = True
+            session['username'] = teacher['username']
+            session['name'] = teacher['teacher_name']
+            # Redirect to index page
+            # return redirect((url_for('Index')))
         else:
             msg = 'Incorrect student id or password'
 
