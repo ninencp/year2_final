@@ -282,8 +282,8 @@ def GetStd(id):
     cursor = db.cursor(pymysql.cursors.DictCursor)
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT * FROM student WHERE std_id = %s", (id))
-        session['data'] = cursor.fetchall()
-        data = session['data']
+        session['std_data'] = cursor.fetchall()
+        data = session['std_data']
         print(data[0])
         return render_template("/student/edit.html", user=data[0])
     return redirect(url_for('Login'))
@@ -293,7 +293,7 @@ def UpdateStd(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     msg = ''
-    data = session['data']
+    data = session['std_data']
 
     if 'loggedin' in session and 'std' in session:
         if request.method == 'POST' and 'username' in request.form and 'std_name' in request.form:
@@ -329,7 +329,7 @@ def UpdateStd(id):
 def EnrollPage():
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
-    data = session['data']
+    data = session['std_data']
 
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id")
@@ -342,7 +342,7 @@ def EnrollPage():
 def Detail(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
-    data = session['data']
+    data = session['std_data']
 
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id WHERE s_id = %s", (id))
