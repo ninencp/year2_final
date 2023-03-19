@@ -44,17 +44,17 @@
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading">เมนูหลัก</div>
-                    <a class="nav-link" href="#">
-                        <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                        {{teacher_name}}
+                    <a class="nav-link disabled" href="{{url_for('THome')}}" style="color: white;">
+                        <div class="sb-nav-link-icon" style="color: white;"><i class="fas fa-user"></i></div>
+                        <span>{{teacher_name}}</span>
                     </a>
                     <a class="nav-link" href="#">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
-                        แก้ไขข้อมูลส่วนตัว
+                        <span>แก้ไขข้อมูลส่วนตัว</span>
                     </a>
                     <a class="nav-link" href="#">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock-keyhole"></i></div>
-                        เปลี่ยนรหัสผ่าน
+                        <span>เปลี่ยนรหัสผ่าน</span>
                     </a>
                 </div>
             </div>

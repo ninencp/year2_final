@@ -173,6 +173,7 @@ def GetUser(id):
     data = cursor.fetchall()
     print(data[0])
     render_template("/teacher/edit.html", user=data[0])
+    
 
 # start app
 if __name__ == "__main__":
