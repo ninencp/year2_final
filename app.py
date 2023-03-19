@@ -179,6 +179,7 @@ def GetUser(id):
 def Update(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
+    msg = ''
 
     if request.method == 'POST' and 'username' in request.form and 'teacher_name' in request.form:
         name = request.form['teacher_name']
@@ -194,14 +195,19 @@ def Update(id):
     elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
         password = request.form['password']
         conf_pw = request.form['conf_pw']
-        cursor.execute("\
-                    UPDATE teacher\
-                    SET password = %s,\
-                        conf_password = %s\
-                    WHERE teacher_id = %s\
-                    ", (password, conf_pw, id))
-        db.commit()
-        return redirect(url_for('Login'))
+
+        if password == conf_pw:
+            cursor.execute("\
+                        UPDATE teacher\
+                        SET password = %s,\
+                            conf_password = %s\
+                        WHERE teacher_id = %s\
+                        ", (password, conf_pw, id))
+            db.commit()
+            return redirect(url_for('Login'))
+        else:
+            msg = 'Password did not match'
+            return render_template("/teacher/edit.html", msg=msg)
      
 # start app
 if __name__ == "__main__":
