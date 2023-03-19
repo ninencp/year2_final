@@ -135,17 +135,19 @@ def Login():
         if std:
             # Create session data to access in other route
             session['loggedin'] = True
+            session['std'] = True
             session['std_id'] = std['std_id']
-            session['name'] = std['std_name']
+            session['std_name'] = std['std_name']
             # Redirect to index page
             # return redirect((url_for('Index')))
         elif teacher:
             # Create session data to access in other route
             session['loggedin'] = True
+            session['teacher'] = True
             session['username'] = teacher['username']
-            session['name'] = teacher['teacher_name']
+            session['teacher_name'] = teacher['teacher_name']
             # Redirect to index page
-            # return redirect((url_for('Index')))
+            return redirect((url_for('THome')))
         else:
             msg = 'Incorrect student id or password'
 
@@ -153,7 +155,12 @@ def Login():
 
 # ---------------- teacher section ---------------- #
 
-# @app.route("/teacher/home")
+@app.route("/teacher/home")
+def THome():
+    if 'loggedin' in session and 'teacher' in session:
+        print('True')
+        return render_template("/teacher/index.html", teacher_name=session['teacher_name'], username=session['username'])
+    return redirect(url_for(Login))
 
 # start app
 if __name__ == "__main__":

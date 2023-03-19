@@ -31,7 +31,7 @@
 <body class="sb-nav-fixed">
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="{{url_for('Index')}}">Dashboard</a>
+    <a class="navbar-brand ps-3" href="{{url_for('THome')}}">Dashboard</a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
     <!-- Navbar-->
@@ -43,14 +43,18 @@
         <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
                 <div class="nav">
-                    <div class="sb-sidenav-menu-heading">ข้อมูล</div>
+                    <div class="sb-sidenav-menu-heading">เมนูหลัก</div>
                     <a class="nav-link" href="#">
                         <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                        {{student_name}}
+                        {{teacher_name}}
                     </a>
                     <a class="nav-link" href="#">
-                        <div class="sb-nav-link-icon"><i class="fas fa-sliders"></i></div>
-                        ตั้งค่า
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
+                        แก้ไขข้อมูลส่วนตัว
+                    </a>
+                    <a class="nav-link" href="#">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock-keyhole"></i></div>
+                        เปลี่ยนรหัสผ่าน
                     </a>
                 </div>
             </div>
@@ -60,52 +64,47 @@
     <div id="layoutSidenav_content">
         <div class="container-fluid">
             <div class="card">
+                <div class="card-header"><h3>ระบบบันทึกการเข้าเรียนออนไลน์</h3></div>
                 <div class="card-body">
                     <div class="row row-cols-auto">
                         <div class="col">
-                            <button type="button" class="btn btn-success">หน้าหลัก</button>
+                            <h5><i class="fa fa-user" style="color: rgb(12, 124, 189);"></i> สวัสดีอาจารย์ {{teacher_name}}</h5>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="card">
+                <div class="card-header">
+                    <div class="row row-cols-auto">
+                        <div class="col"><h4>รายวิชาที่สอน</h4></div>
                         <div class="col">
-                            <!-- <button type="button" class="btn btn-primary">สถิติการเข้าเรียน</button> -->
+                            <button type="button" class="btn btn-primary btn-sm">+ เพิ่มรายวิชา</button>
                         </div>
                     </div>
+                    
                 </div>
-            </div>
-            <br>
-            <div class="row">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
+                                <thead>
+                                    <tr class="table-info">
+                                        <th width="5%">ลำดับที่</th>
+                                        <th width="55%">รายวิชา</th>
+                                        <th width="10%">จำนวนนิสิต</th>
+                                        <th width="10%">เข้าเรียน</th>
+                                        <th width="10%">ประวัติการเข้าเรียน</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                <div class="col d-flex justify-content-center">
-                    <div class="card" style="width: 25rem;">
-                        <div class="card-header"><b>รายละเอียดการเข้าเรียน</b></div>
-                        <div class="card-body">
-                            <p>วันที่ : {{data.date}}</p>
-                            <p>วิชา : {{data.course_id}} {{data.name}}</p>
-                            <p>เวลาเข้า : {{data.start_time}}</p>
-                            <p>เวลาออก : {{data.end_time}}</p>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <br>
-            <div class="row">
-                <div class="col">
-                    <div class="card border-success mb-3" style="width: 25%;">
-                        <div class="card-header" style="font-size: large;"><b>{{data.course_id}} {{data.name}}</b></div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">No data</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-chart-pie fa-2x text-muted"></i>
-                                </div>                                
-                            </div>
-                        </div>
-                        <div class="card-footer text-center" style="font-size: large;"><a href="#" style="text-decoration: none; color: black;">รายละเอียด</a></div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
