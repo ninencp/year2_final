@@ -157,9 +157,12 @@ def Login():
 
 @app.route("/teacher/home")
 def THome():
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
     if 'loggedin' in session and 'teacher' in session:
-        print('True')
-        return render_template("/teacher/index.html", teacher_name=session['teacher_name'], username=session['username'])
+        cursor.execute("SELECT * from subject")
+        subject = cursor.fetchall()
+        return render_template("/teacher/index.html", teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for(Login))
 
 # start app
