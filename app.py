@@ -339,10 +339,23 @@ def Enroll():
             subject = request.form['subject']
             print(subject_id, subject, std_id)
 
-            cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
-            db.commit()
+            cursor.execute("SELECT ref_s_id, subject.s_name FROM enroll INNER JOIN subject WHERE enroll.ref_s_id=subject.s_id")
+            subject_data = cursor.fetchall()
 
-            msg = 'ลงทะเบียนเรียบร้อย'
+            for data in subject_data:
+                if data["ref_s_id"] == subject_id:
+
+                    cursor.execute("SELECT * from enroll WHERE ref_s_id = %s AND ref_std_id = %s", (subject_id, std_id))
+                    enroll_check = cursor.fetchone()
+
+                    if enroll_check:
+                        msg='ลงทะเบียนรายวิชานี้แล้ว'
+                    else:
+                        cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
+                        db.commit()
+                        msg = 'ลงทะเบียนเรียบร้อย'
+                else:
+                    msg = 'ไม่มีรายวิชานี้'
             return render_template("/student/enroll.html", msg=msg, user=data[0])
         return render_template("/student/enroll.html", user=data[0])
     return redirect(url_for('Login'))
