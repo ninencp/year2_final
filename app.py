@@ -325,6 +325,28 @@ def UpdateStd(id):
                 return render_template("/teacher/edit.html", msg=msg, user=data[0])
     return redirect(url_for('Login'))
 
+@app.route("/student/enroll", methods=['GET','POST'])
+def Enroll():
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    msg = ''
+    data = session['data']
+    std_id = session['std_id']
+
+    if 'loggedin' in session and 'std' in session:
+        if request.method == 'POST' and 'subject_id' in request.form and 'subject' in request.form:
+            subject_id = request.form['subject_id']
+            subject = request.form['subject']
+            print(subject_id, subject, std_id)
+
+            cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, subject))
+            db.commit()
+
+            msg = 'ลงทะเบียนเรียบร้อย'
+            return render_template("/teacher/addsubject.html", msg=msg, user=data[0])
+        return render_template("/teacher/addsubject.html", user=data[0])
+    return redirect(url_for('Login'))
+
 # start app
 if __name__ == "__main__":
     app.run(port=4000, debug=True)
