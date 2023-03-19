@@ -170,11 +170,13 @@ def THome():
 def GetUser(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
-    session['data'] = cursor.fetchall()
-    data = session['data']
-    print(data[0])
-    return render_template("/teacher/edit.html", user=data[0])
+    if 'loggedin' in session and 'teacher' in session:
+        cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
+        session['data'] = cursor.fetchall()
+        data = session['data']
+        print(data[0])
+        return render_template("/teacher/edit.html", user=data[0])
+    return redirect(url_for(Login))
     
 @app.route("/teacher/update/<id>", methods=['POST'])
 def Update(id):
@@ -183,33 +185,35 @@ def Update(id):
     msg = ''
     data = session['data']
 
-    if request.method == 'POST' and 'username' in request.form and 'teacher_name' in request.form:
-        name = request.form['teacher_name']
-        username = request.form['username']
-        cursor.execute("\
-                    UPDATE teacher\
-                    SET teacher_name = %s,\
-                        username = %s\
-                    WHERE teacher_id = %s\
-                    ", (name, username, id))
-        db.commit()
-        return redirect(url_for('Login'))
-    elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
-        password = request.form['password']
-        conf_pw = request.form['conf_pw']
-
-        if password == conf_pw:
+    if 'loggedin' in session and 'teacher' in session:
+        if request.method == 'POST' and 'username' in request.form and 'teacher_name' in request.form:
+            name = request.form['teacher_name']
+            username = request.form['username']
             cursor.execute("\
                         UPDATE teacher\
-                        SET password = %s,\
-                            conf_password = %s\
+                        SET teacher_name = %s,\
+                            username = %s\
                         WHERE teacher_id = %s\
-                        ", (password, conf_pw, id))
+                        ", (name, username, id))
             db.commit()
             return redirect(url_for('Login'))
-        else:
-            msg = 'Password did not match'
-            return render_template("/teacher/edit.html", msg=msg, user=data[0])
+        elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
+            password = request.form['password']
+            conf_pw = request.form['conf_pw']
+
+            if password == conf_pw:
+                cursor.execute("\
+                            UPDATE teacher\
+                            SET password = %s,\
+                                conf_password = %s\
+                            WHERE teacher_id = %s\
+                            ", (password, conf_pw, id))
+                db.commit()
+                return redirect(url_for('Login'))
+            else:
+                msg = 'Password did not match'
+                return render_template("/teacher/edit.html", msg=msg, user=data[0])
+    return redirect(url_for(Login))
      
 # start app
 if __name__ == "__main__":
