@@ -138,6 +138,7 @@ def Login():
             session['std'] = True
             session['std_id'] = std['std_id']
             session['std_name'] = std['std_name']
+            session['username'] = std['username']
             # Redirect to index page
             # return redirect((url_for('Index')))
         elif teacher:
@@ -155,6 +156,17 @@ def Login():
     return render_template("login.html", msg=msg)
 
 # ---------------- teacher section ---------------- #
+
+@app.route("/teacher/logout")
+def Logout():
+    # Remove session data. This will log user out.
+    session.pop('loggedin', None)
+    session.pop('teacher', None)
+    session.pop('teacher_id', None)
+    session.pop('teacher_name', None)
+    session.pop('username', None)
+    # Redirect to Login Page
+    return redirect(url_for('Login'))
 
 @app.route("/teacher/home")
 def THome():
@@ -238,6 +250,20 @@ def AddSubject():
             return render_template("/teacher/addsubject.html", msg=msg, user=data[0])
         return render_template("/teacher/addsubject.html", user=data[0])
     return redirect(url_for(Login))
+
+# ---------------- student section ---------------- #
+
+@app.route("/student/logout")
+def Logout():
+    # Remove session data. This will log user out.
+    session.pop('loggedin', None)
+    session.pop('std', None)
+    session.pop('std_id', None)
+    session.pop('std_name', None)
+    session.pop('username', None)
+    # Redirect to Login Page
+    return redirect(url_for('Login'))
+
 # start app
 if __name__ == "__main__":
     app.run(port=4000, debug=True)
