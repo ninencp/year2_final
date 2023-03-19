@@ -296,17 +296,15 @@ def UpdateStd(id):
     data = session['data']
 
     if 'loggedin' in session and 'std' in session:
-        if request.method == 'POST' and 'username' in request.form and 'std_name' in request.form and 'new_std_id' in request.form:
+        if request.method == 'POST' and 'username' in request.form and 'std_name' in request.form:
             name = request.form['std_name']
             username = request.form['username']
-            new_std_id = request.form['new_std_id']
             cursor.execute("\
-                        UPDATE teacher\
+                        UPDATE student\
                         SET std_name = %s,\
-                            username = %s,\
-                            std_id = %s\
+                            username = %s\
                         WHERE std_id = %s\
-                        ", (name, username, id, new_std_id))
+                        ", (name, username, id))
             db.commit()
             return redirect(url_for('Login'))
         elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
@@ -318,7 +316,7 @@ def UpdateStd(id):
                             UPDATE student\
                             SET password = %s,\
                                 conf_password = %s\
-                            WHERE teacher_id = %s\
+                            WHERE std_id = %s\
                             ", (password, conf_pw, id))
                 db.commit()
                 return redirect(url_for('Login'))

@@ -31,7 +31,7 @@
 <body class="sb-nav-fixed">
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="{{url_for('THome')}}">AAI Check !</a>
+    <a class="navbar-brand ps-3" href="{{url_for('StdHome')}}">AAI Check !</a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
     <!-- Navbar-->
@@ -75,10 +75,6 @@
                             <input type="text" id="std_name" class="form-control form-control-lg" name="std_name" />
                             <label class="form-label" for="std_name">ชื่อ : {{user.std_name}}</label>
                         </div>
-                        <div class="form-outline mb-4">
-                            <input type="text" id="new_std_id" class="form-control form-control-lg" name="new_std_id" />
-                            <label class="form-label" for="new_std_id">รหัสนิสิต : {{user.std_id}}</label>
-                        </div>
                         <div class="d-flex justify-content-center">
                             <button type="submit"
                               class="btn btn-success btn-lg gradient-custom-4 text-body" style="font-family: 'Prompt'; font-weight: bold;">แก้ไขข้อมูล</button>
@@ -90,7 +86,7 @@
             <div class="card" style="margin-top: 2%;">
                 <div class="card-header"><h3>เปลี่ยนรหัสผ่าน</h3></div>
                 <div class="card-body">
-                    <form action="/teacher/update/{{user.teacher_id}}" method="post">
+                    <form action="/student/update/{{user.std_id}}" method="post">
                         <div class="form-outline mb-4">
                             <input type="password" id="password" class="form-control form-control-lg" name="password" />
                             <label class="form-label" for="password">รหัสผ่านใหม่</label>
