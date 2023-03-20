@@ -68,11 +68,11 @@
                 <div class="card-body">
                     <form action="/teacher/update/{{user.teacher_id}}" method="post">
                         <div class="form-outline mb-4">
-                            <input type="text" id="username" class="form-control form-control-lg" name="username" />
+                            <input type="text" id="username" class="form-control form-control-lg" name="username" required/>
                             <label class="form-label" for="username">ชื่อผู้ใช้ : {{user.username}}</label>
                         </div>
                         <div class="form-outline mb-4">
-                            <input type="text" id="teacher_name" class="form-control form-control-lg" name="teacher_name" />
+                            <input type="text" id="teacher_name" class="form-control form-control-lg" name="teacher_name" required/>
                             <label class="form-label" for="teacher_name">ชื่อ : {{user.teacher_name}}</label>
                         </div>
                         <div class="d-flex justify-content-center">
@@ -88,11 +88,11 @@
                 <div class="card-body">
                     <form action="/teacher/update/{{user.teacher_id}}" method="post">
                         <div class="form-outline mb-4">
-                            <input type="password" id="password" class="form-control form-control-lg" name="password" />
+                            <input type="password" id="password" class="form-control form-control-lg" name="password" required/>
                             <label class="form-label" for="password">รหัสผ่านใหม่</label>
                         </div>
                         <div class="form-outline mb-4">
-                            <input type="password" id="conf_pw" class="form-control form-control-lg" name="conf_pw" />
+                            <input type="password" id="conf_pw" class="form-control form-control-lg" name="conf_pw" required/>
                             <label class="form-label" for="conf_pw">ยืนยันรหัสผ่าน</label>
                         </div>
                         <div class="d-flex justify-content-center">
