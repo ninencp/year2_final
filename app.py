@@ -266,7 +266,6 @@ def AddSubject():
 def CheckinHist(s_id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
-    msg = ''
     data = session['data']
     teacher_id = session['teacher_id']
 
@@ -278,6 +277,14 @@ def CheckinHist(s_id):
         return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, teacher_id=teacher_id, user=data[0])
     return redirect(url_for('Login'))
 
+@app.route("/teacher/checkDetailbyDate/<date>/<s_id>")
+def CheckDetailbyDate(date, s_id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    data = session['data']
+
+    if 'loggedin' in session and 'teacher' in session:
+        cursor.execute("")
 
 
 # ---------------- student section ---------------- #
