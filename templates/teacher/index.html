@@ -105,6 +105,8 @@
                                         <td>{{subject.totalstd}}</td>
                                         {% if subject.totalstd > 0 %}
                                             <td><a type="button" class="btn btn-warning btn-sm" href="#">+ เช็คชื่อ</a></td>
+                                            <td><a type="button" class="btn btn-info btn-sm" href="/teacher/checkinHistory/{{subject.s_id}}">ประวัติ</a></td>
+                                            
                                         {% else %}
                                             <td>-</td>
                                         {% endif %}

@@ -262,6 +262,24 @@ def AddSubject():
         return render_template("/teacher/addsubject.html", user=data[0])
     return redirect(url_for('Login'))
 
+@app.route("/teacher/checkinHistory/<s_id>", methods=['GET','POST'])
+def CheckinHist(s_id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    msg = ''
+    data = session['data']
+    teacher_id = session['teacher_id']
+
+    if 'loggedin' in session and 'teacher' in session:
+        print(s_id, teacher_id)
+        cursor.execute("SELECT check_in_date FROM checkin WHERE ref_s_id=%s AND ref_teacher_id=%s GROUP BY check_in_date", (s_id ,teacher_id))
+        hist = cursor.fetchone()
+        print(hist)
+        return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, teacher_id=teacher_id, user=data[0])
+    return redirect(url_for('Login'))
+
+
+
 # ---------------- student section ---------------- #
 
 @app.route("/student/logout")
