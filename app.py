@@ -282,18 +282,24 @@ def CheckDetailbyDate(date, s_id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['data']
+    cursor.execute("SELECT start_time FROM subject WHERE s_id=%s",(s_id))
+    late_check = cursor.fetchone()
+    print(late_check)
 
     if 'loggedin' in session and 'teacher' in session:
-        cursor.execute("SELECT s.*, i.check_in_status, i.no FROM student AS s \
+        cursor.execute("SELECT s.*, i.check_in_status, TIME(i.date_save) AS check_in_time, i.no FROM student AS s \
                        JOIN checkin AS i ON s.std_id=i.ref_std_id\
                        WHERE i.ref_s_id=%s AND i.check_in_date=%s\
-                       GROUP BY i.ref_std_id",
+                       GROUP BY i.ref_std_id ORDER BY s.std_id DESC",
                        (s_id, date))
         checkin_data = cursor.fetchall()
+        print(checkin_data)
 
         #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
         if len(checkin_data) < 1:
             return redirect(url_for('THome'))
+        return render_template("/teacher/checkin_hist_view.html", late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data)
+
 
 
 # ---------------- student section ---------------- #
