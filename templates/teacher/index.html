@@ -93,7 +93,7 @@
                                         <th width="5%">รหัสวิชา</th>
                                         <th width="55%">รายวิชา</th>
                                         <th width="10%">จำนวนนิสิต</th>
-                                        <th width="10%">เข้าเรียน</th>
+                                        <th width="10%">เช็คชื่อ</th>
                                         <th width="10%">ประวัติการเข้าเรียน</th>
                                     </tr>
                                 </thead>
@@ -102,8 +102,12 @@
                                     <tr>
                                         <td>{{subject.s_id}}</td>
                                         <td>{{subject.s_name}}</td>
-                                        <td>no</td>
-                                        <td>no</td>
+                                        <td>{{subject.totalstd}}</td>
+                                        {% if subject.totalstd > 0 %}
+                                            <td><a type="button" class="btn btn-warning btn-sm" href="#">+ เช็คชื่อ</a></td>
+                                        {% else %}
+                                            <td>-</td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>

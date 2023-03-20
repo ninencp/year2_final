@@ -174,9 +174,11 @@ def TLogout():
 def THome():
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
+    subject_data = []
     if 'loggedin' in session and 'teacher' in session:
-        cursor.execute("SELECT * from subject")
+        cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
         subject = cursor.fetchall()
+        print(subject)
         return render_template("/teacher/index.html", teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for('Login'))
 
