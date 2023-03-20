@@ -277,14 +277,23 @@ def CheckinHist(s_id):
         return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, teacher_id=teacher_id, user=data[0])
     return redirect(url_for('Login'))
 
-@app.route("/teacher/checkDetailbyDate/<date>/<s_id>")
+@app.route("/teacher/checkDetailbyDate/<date>/<s_id>", methods=['GET','POST'])
 def CheckDetailbyDate(date, s_id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['data']
 
     if 'loggedin' in session and 'teacher' in session:
-        cursor.execute("")
+        cursor.execute("SELECT s.*, i.check_in_status, i.no FROM student AS s \
+                       JOIN checkin AS i ON s.std_id=i.ref_std_id\
+                       WHERE i.ref_s_id=%s AND i.check_in_date=%s\
+                       GROUP BY i.ref_std_id",
+                       (s_id, date))
+        checkin_data = cursor.fetchall()
+
+        #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
+        if len(checkin_data) < 1:
+            return redirect(url_for('THome'))
 
 
 # ---------------- student section ---------------- #
