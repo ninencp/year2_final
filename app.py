@@ -330,12 +330,13 @@ def StdHome():
 def GetStd(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
+    std_id = session['std_id']
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT * FROM student WHERE std_id = %s", (id))
         session['std_data'] = cursor.fetchall()
         data = session['std_data']
         print(data[0])
-        return render_template("/student/edit.html", user=data[0])
+        return render_template("/student/edit.html", user=data[0],std_id=std_id, std_name=session['std_name'], username=session['username'])
     return redirect(url_for('Login'))
     
 @app.route("/student/update/<id>", methods=['POST'])
@@ -344,6 +345,7 @@ def UpdateStd(id):
     cursor = db.cursor(pymysql.cursors.DictCursor)
     msg = ''
     data = session['std_data']
+    std_id = session['std_id']
 
     if 'loggedin' in session and 'std' in session:
         if request.method == 'POST' and 'username' in request.form and 'std_name' in request.form:
@@ -372,7 +374,7 @@ def UpdateStd(id):
                 return redirect(url_for('Login'))
             else:
                 msg = 'Password did not match'
-                return render_template("/teacher/edit.html", msg=msg, user=data[0])
+                return render_template("/teacher/edit.html", msg=msg, user=data[0],std_id=std_id, std_name=session['std_name'], username=session['username'])
     return redirect(url_for('Login'))
 
 @app.route("/student/enroll")
@@ -380,12 +382,13 @@ def EnrollPage():
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['std_data']
+    std_id = session['std_id']
 
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id")
         subject = cursor.fetchall()
         print(subject)
-        return render_template("/student/enroll.html", user=data[0], subject=subject)
+        return render_template("/student/enroll.html", user=data[0], subject=subject,std_id=std_id, std_name=session['std_name'], username=session['username'])
     return redirect(url_for('Login'))
 
 @app.route('/student/enroll/<id>', methods=['GET','POST'])
@@ -393,6 +396,7 @@ def Detail(id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['std_data']
+    std_id = session['std_id']
 
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT subject.*, teacher.teacher_name from subject inner join teacher on ref_teacher_id=teacher_id WHERE s_id = %s", (id))
@@ -411,9 +415,8 @@ def Detail(id):
                 cursor.execute("INSERT INTO enroll (ref_s_id, ref_std_id) VALUES (%s,%s)", (subject_id, std_id))
                 db.commit()
                 msg = 'ลงทะเบียนเรียบร้อย'
-
-            return render_template("/student/detail.html", msg=msg, user=data[0], subject=subject)
-        return render_template("/student/detail.html", user=data[0], subject=subject)
+            return render_template("/student/detail.html", msg=msg, user=data[0], subject=subject,std_id=std_id, std_name=session['std_name'], username=session['username'])
+        return render_template("/student/detail.html", user=data[0], subject=subject,std_id=std_id, std_name=session['std_name'], username=session['username'])
     return redirect(url_for('Login'))
 
 # start app
