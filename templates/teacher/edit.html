@@ -1,5 +1,19 @@
 {% extends "layout_teacher.html" %}
 {% block title %}Edit{% endblock %}
+{% block class %}
+<a class="nav-link" href="{{url_for('THome')}}">
+    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+    <span>{{teacher_name}}</span>
+</a>
+<a class="nav-link" href="/teacher/edit/{{teacher_id}}" style="color: white;">
+    <div class="sb-nav-link-icon" style="color: white;"><i class="fa-solid fa-address-card"></i></div>
+    <span>แก้ไขข้อมูลส่วนตัว</span>
+</a>
+<a class="nav-link" href="#">
+    <div class="sb-nav-link-icon"><i class="fa-solid fa-chart-line"></i></i></div>
+    <span>Dashboard</span>
+</a>
+{% endblock %}
 {% block body %}
     <div id="layoutSidenav_content">
         <div class="container-fluid">
