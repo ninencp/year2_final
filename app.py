@@ -22,21 +22,79 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_DB'] = 'iot_project'
 mysql.init_app(app)
 
-# -------------------------- Content --------------------------
+# -------------------------- Function -------------------------- #
 
-# @app.route("/home")
-# def Index():
-#     db = mysql.connect()
-#     cursor = db.cursor(pymysql.cursors.DictCursor)
-#     # Check if user is logged in
-#     if 'loggedin' in session:
-#         cursor.execute("SELECT * FROM course INNER JOIN session ON session.course_id=course.course_id")
-#         data = cursor.fetchone()
-#         print(data)
-#         # if user logged in show them homepage
-#         return render_template('index.html', student_id=session['student_id'], student_name=session['name'], data=data)
-#     # if user isn't logged in return to login page
-#     return redirect(url_for('Login'))
+#### Saving Date today in 2 different formats / บันทึกวันที่วันนี้ใน 2 รูปแบบที่แตกต่างกัน
+datetoday = date.today().strftime("%m_%d_%y")
+datetoday2 = date.today().strftime("%d-%B-%Y")
+
+#### Initializing VideoCapture object to access WebCam / กำหนด Webcam เเละ ดึง Model 
+face_detector = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
+eye_detector = cv2.CascadeClassifier('static/haarcascade_eye_tree_eyeglasses.xml')
+cap = cv2.VideoCapture(0)
+
+#### If these directories don't exist, create them / หากไม่มีไดเร็กทอรีเหล่านี้ ให้สร้างขึ้นใหม่ "สร้างโฟลเดอร์หน้า"
+if not os.path.isdir('Attendance'):
+    os.makedirs('Attendance')
+if not os.path.isdir('static/faces'):
+    os.makedirs('static/faces')
+if f'Attendance-{datetoday}.csv' not in os.listdir('Attendance'):
+    with open(f'Attendance/Attendance-{datetoday}.csv','w') as f:
+        f.write('ref_teacher_id, ref_s_id, ref_std_id, check_in_date, date_save')
+
+#### get a number of total registered users / รับจำนวนผู้ใช้ที่ลงทะเบียนทั้งหมด
+def totalreg():
+    return len(os.listdir('static/faces'))
+
+#### extract the face from an image / แยกใบหน้าออกจากรูปภาพ
+def extract_faces(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    face_points = face_detector.detectMultiScale(gray, 1.3, 5)
+    return face_points
+
+#### Identify face using ML model / ระบุใบหน้าโดยใช้โมเดล ML
+def identify_face(facearray):
+    model = joblib.load('static/face_recognition_model.pkl')
+    return model.predict(facearray)
+
+#### A function which trains the model on all the faces available in faces folder / ฟังก์ชันที่ฝึกโมเดลบนใบหน้าทั้งหมดที่มีในโฟลเดอร์ใบหน้า
+def train_model():
+    faces = []
+    eyes = []
+    labels = []
+    userlist = os.listdir('static/faces')
+    for user in userlist:
+        for imgname in os.listdir(f'static/faces/{user}'):
+            img = cv2.imread(f'static/faces/{user}/{imgname}')
+            resized_face = cv2.resize(img, (50, 50))
+            faces.append(resized_face.ravel())
+            labels.append(user)
+    faces = np.array(faces)
+    knn = KNeighborsClassifier(n_neighbors=1)
+    knn.fit(faces,labels)
+    joblib.dump(knn,'static/face_recognition_model.pkl')
+
+#### Extract info from today's attendance file in attendance folder / แยกข้อมูลจากไฟล์การเข้างานของวันนี้ในโฟลเดอร์การเข้างาน
+def extract_attendance():
+    df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
+    names = df['Name']
+    rolls = df['Roll']
+    times = df['Time']
+    l = len(df)
+    return names,rolls,times,l
+
+#### Add Attendance of a specific user / เพิ่มการเข้าร่วมของผู้ใช้เฉพาะ
+def add_attendance(name):
+    username = name.split('_')[0]
+    userid = name.split('_')[1]
+    current_time = datetime.now().strftime("%H:%M:%S")
+    
+    df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
+    if int(userid) not in list(df['Roll']):
+        with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
+            f.write(f'\n{username},{userid},{current_time}')
+
+# -------------------------- Content -------------------------- #
 
 @app.route("/register_std", methods=['GET', 'POST'])
 def Register_std():
@@ -71,9 +129,35 @@ def Register_std():
             msg = 'Password did not match'
         else:
             # Account does not exist
-            cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
-            db.commit()
-            msg = 'Successfully Registered'
+            imagefolder = 'static/faces/'+username+'_'+str(student_id)
+            if not os.path.isdir(imagefolder):
+                os.makedirs(imagefolder)
+            # cap = cv2.VideoCapture(0)
+            # i,j = 0,0
+            # while 1:
+            #     _,frame = cap.read()
+            #     faces = extract_faces(frame)
+            #     for (x,y,w,h) in faces:
+            #         cv2.rectangle(frame,(x, y), (x+w, y+h), (255, 0, 20), 2)
+            #         cv2.putText(frame,f'Images Captured: {i}/100',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
+            #         if j%10==0:
+            #             filename = username+'_'+str(i)+'.jpg'
+            #             cv2.imwrite(imagefolder+'/'+filename,frame[y:y+h,x:x+w])
+            #             i+=1
+            #         j+=1
+            #     if j==1000:
+            #         break
+            #     cv2.imshow('Adding student face', frame)
+            #     if cv2.waitKey(1) & 0xFF == ord('q'):
+            #         break
+            # cap.release()
+            # cv2.destroyAllWindows()
+            # train_model()
+                    
+
+            # cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
+            # db.commit()
+            # msg = 'Successfully Registered'
 
     elif request.method == "POST":
         msg = 'Please fill out the form'
