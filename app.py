@@ -416,7 +416,11 @@ def StdHome():
     if 'loggedin' in session and 'std' in session:
         cursor.execute("SELECT subject.s_name, ref_s_id FROM subject INNER JOIN enroll ON subject.s_id=ref_s_id WHERE enroll.ref_std_id=%s", (std_id))
         enroll = cursor.fetchall()
-        return render_template("/student/index.html", std_id=std_id, std_name=session['std_name'], username=session['username'], enroll=enroll)
+        cursor.execute("SELECT * FROM student WHERE std_id = %s", (id))
+        session['std_data'] = cursor.fetchall()
+        data = session['std_data']
+        print(data[0])
+        return render_template("/student/index.html", user=data[0], std_id=std_id, std_name=session['std_name'], username=session['username'], enroll=enroll)
     return redirect(url_for('Login'))    
 
 @app.route("/student/edit/<id>", methods=['GET','POST'])
