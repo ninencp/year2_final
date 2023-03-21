@@ -16,24 +16,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>  
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>    
     <style>
         h1,h2,h3,h4,h5,h6,p,ul,label,nav,div {
             font-family: 'Prompt', sans-serif;;
         }
     </style>
     <!-- MDB -->
-    <title>{% block title %}{% endblock %}</title>
+    <title>AAI Check !</title>
 </head>
 <body class="sb-nav-fixed">
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="{{url_for('StdHome')}}">AAI Check !</a>
-        <!-- Sidebar Toggle-->
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-        <!-- Navbar-->
-        <a href="{{url_for('Login')}}" class="btn btn-light ms-auto me-0 me-md-3 my-2 my-md-0">ออกจากระบบ</a>
-    </nav>
+  <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="{{url_for('THome')}}">AAI Check !</a>
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+    <!-- Navbar-->
+    <a href="{{url_for('Login')}}" class="btn btn-light ms-auto me-0 me-md-3 my-2 my-md-0">ออกจากระบบ</a>
+</nav>
 
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
@@ -41,17 +41,13 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading">เมนูหลัก</div>
-                        <a class="nav-link disabled" href="{{url_for('StdHome')}}" style="color: white;">
+                        <a class="nav-link disabled" href="{{url_for('THome')}}" style="color: white;">
                             <div class="sb-nav-link-icon" style="color: white;"><i class="fas fa-user"></i></div>
-                            <span>{{std_name}}</span>
+                            <span>{{teacher_name}}</span>
                         </a>
-                        <a class="nav-link" href="/student/edit/{{std_id}}">
+                        <a class="nav-link" href="/teacher/edit/{{teacher_id}}">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
                             <span>แก้ไขข้อมูลส่วนตัว</span>
-                        </a>
-                        <a class="nav-link" href="/student/edit/{{std_id}}">
-                            <div class="sb-nav-link-icon"><i class="fa-regular fa-face-smile"></i></div>
-                            <span>ลงทะเบียนใบหน้า</span>
                         </a>
                         <a class="nav-link" href="#">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-chart-line"></i></i></div>
@@ -61,7 +57,7 @@
                 </div>
             </nav>
         </div>
-    
+
         {% block body %}
         {% endblock %}
 

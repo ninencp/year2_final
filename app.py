@@ -190,7 +190,7 @@ def GetUser(id):
         session['data'] = cursor.fetchall()
         data = session['data']
         print(data[0])
-        return render_template("/teacher/edit.html", user=data[0])
+        return render_template("/teacher/edit.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
     
 @app.route("/teacher/update/<id>", methods=['POST'])
@@ -227,7 +227,7 @@ def Update(id):
                 return redirect(url_for('Login'))
             else:
                 msg = 'Password did not match'
-                return render_template("/teacher/edit.html", msg=msg, user=data[0])
+                return render_template("/teacher/edit.html", msg=msg, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
      
 @app.route("/teacher/addsubject", methods=['GET','POST'])
@@ -259,7 +259,7 @@ def AddSubject():
                 msg = 'เพิ่มรายวิชาเรียบร้อย'
 
             return render_template("/teacher/addsubject.html", msg=msg, user=data[0])
-        return render_template("/teacher/addsubject.html", user=data[0])
+        return render_template("/teacher/addsubject.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
 
 @app.route("/teacher/checkinHistory/<s_id>", methods=['GET','POST'])
@@ -274,7 +274,7 @@ def CheckinHist(s_id):
         cursor.execute("SELECT check_in_date FROM checkin WHERE ref_s_id=%s AND ref_teacher_id=%s GROUP BY check_in_date", (s_id ,teacher_id))
         hist = cursor.fetchone()
         print(hist)
-        return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, teacher_id=teacher_id, user=data[0])
+        return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
 
 @app.route("/teacher/checkDetailbyDate/<date>/<s_id>", methods=['GET','POST'])
@@ -298,7 +298,7 @@ def CheckDetailbyDate(date, s_id):
         #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
         if len(checkin_data) < 1:
             return redirect(url_for('THome'))
-        return render_template("/teacher/checkin_hist_view.html", late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data)
+        return render_template("/teacher/checkin_hist_view.html", late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
 
 
 
