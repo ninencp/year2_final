@@ -145,6 +145,10 @@ def Register_std():
                         i+=1
                     j+=1
                 if j==1000:
+                    cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
+                    cursor.execute("INSERT INTO face (ref_std_id) VALUES (%s)", (student_id))
+                    db.commit()
+                    msg = 'Successfully Registered'
                     break
                 cv2.imshow('Adding student face', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -152,11 +156,6 @@ def Register_std():
             cap.release()
             cv2.destroyAllWindows()
             train_model()        
-
-            cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
-            cursor.execute("INSERT INTO face (ref_std_id) VALUES (%s)", (student_id))
-            db.commit()
-            msg = 'Successfully Registered'
 
     elif request.method == "POST":
         msg = 'Please fill out the form'
@@ -267,7 +266,12 @@ def THome():
         cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
         subject = cursor.fetchall()
         print(subject)
-        return render_template("/teacher/index.html", teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
+        t_id = session['teacher_id']
+        cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (t_id))
+        session['data'] = cursor.fetchall()
+        data = session['data']
+        print('data :',data[0])
+        return render_template("/teacher/index.html", user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for('Login'))
 
 @app.route("/teacher/edit/<id>", methods=['GET','POST'])
@@ -278,7 +282,7 @@ def GetUser(id):
         cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (id))
         session['data'] = cursor.fetchall()
         data = session['data']
-        print(data[0])
+        print('data :',data[0])
         return render_template("/teacher/edit.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
     
