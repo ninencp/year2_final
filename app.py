@@ -60,7 +60,6 @@ def identify_face(facearray):
 #### A function which trains the model on all the faces available in faces folder / ฟังก์ชันที่ฝึกโมเดลบนใบหน้าทั้งหมดที่มีในโฟลเดอร์ใบหน้า
 def train_model():
     faces = []
-    eyes = []
     labels = []
     userlist = os.listdir('static/faces')
     for user in userlist:
@@ -132,32 +131,32 @@ def Register_std():
             imagefolder = 'static/faces/'+username+'_'+str(student_id)
             if not os.path.isdir(imagefolder):
                 os.makedirs(imagefolder)
-            # cap = cv2.VideoCapture(0)
-            # i,j = 0,0
-            # while 1:
-            #     _,frame = cap.read()
-            #     faces = extract_faces(frame)
-            #     for (x,y,w,h) in faces:
-            #         cv2.rectangle(frame,(x, y), (x+w, y+h), (255, 0, 20), 2)
-            #         cv2.putText(frame,f'Images Captured: {i}/100',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
-            #         if j%10==0:
-            #             filename = username+'_'+str(i)+'.jpg'
-            #             cv2.imwrite(imagefolder+'/'+filename,frame[y:y+h,x:x+w])
-            #             i+=1
-            #         j+=1
-            #     if j==1000:
-            #         break
-            #     cv2.imshow('Adding student face', frame)
-            #     if cv2.waitKey(1) & 0xFF == ord('q'):
-            #         break
-            # cap.release()
-            # cv2.destroyAllWindows()
-            # train_model()
-                    
+            cap = cv2.VideoCapture(0)
+            i,j = 0,0
+            while 1:
+                _,frame = cap.read()
+                faces = extract_faces(frame)
+                for (x,y,w,h) in faces:
+                    cv2.rectangle(frame,(x, y), (x+w, y+h), (255, 0, 20), 2)
+                    cv2.putText(frame,f'Images Captured: {i}/100',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
+                    if j%10==0:
+                        filename = username+'_'+str(i)+'.jpg'
+                        cv2.imwrite(imagefolder+'/'+filename,frame[y:y+h,x:x+w])
+                        i+=1
+                    j+=1
+                if j==1000:
+                    break
+                cv2.imshow('Adding student face', frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+            cap.release()
+            cv2.destroyAllWindows()
+            train_model()        
 
-            # cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
-            # db.commit()
-            # msg = 'Successfully Registered'
+            cursor.execute("INSERT INTO student (std_id, std_name, password, conf_password, username) VALUES (%s, %s, %s, %s, %s)", (student_id, name, password, conf_pw, username))
+            cursor.execute("INSERT INTO face (ref_std_id) VALUES (%s)", (student_id))
+            db.commit()
+            msg = 'Successfully Registered'
 
     elif request.method == "POST":
         msg = 'Please fill out the form'
