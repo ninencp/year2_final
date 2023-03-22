@@ -5,6 +5,7 @@ from flask import (Flask, flash, redirect, render_template, request, session,
 from flaskext.mysql import MySQL
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
@@ -102,7 +103,8 @@ def add_attendance(name, s_id, checkin_date):
     std_id = enroll_check['std_id']
 
     checkin_time_str = datetime.now().strftime("%H:%M:%S")
-    checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S").time()
+    checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S")
+    checkin_time = timedelta(hours=checkin_time.hour, minutes=checkin_time.minute, seconds=checkin_time.second)
     in_time = enroll_check['start_time']
     print(type(checkin_time), checkin_time)
     print(in_time)
@@ -120,7 +122,7 @@ def add_attendance(name, s_id, checkin_date):
         msg = f'เช็คชื่อวันที่ {checkin_date} เรียบร้อยแล้ว'
 
     df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
-    if int(userid) not in list(df['รหัสนักศึกษา']):
+    if int(userid) not in list(df['student id']):
         with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
             f.write(f'\n{teacher_id},{s_id},{std_id},{checkin_date},{current_time}')
     
@@ -397,6 +399,9 @@ def Checkin(s_id, checkin_date):
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['data']
     teacher_id = session['teacher_id']
+    cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
+    subject = cursor.fetchall()
+    print(subject)
 
     if 'face_recognition_model.pkl' not in os.listdir('static'):
         return render_template('index.html',msg='ยังไม่มีข้อมูลใบหน้าใน model')
