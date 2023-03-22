@@ -25,8 +25,8 @@ mysql.init_app(app)
 # -------------------------- Function -------------------------- #
 
 #### Saving Date today in 2 different formats / บันทึกวันที่วันนี้ใน 2 รูปแบบที่แตกต่างกัน
-datetoday = date.today().strftime("%m_%d_%y")
-datetoday2 = date.today().strftime("%d-%B-%Y")
+datetoday = date.today().strftime("%d_%m_%y")
+datetoday2 = date.today().strftime("%d-%m-%Y")
 
 #### Initializing VideoCapture object to access WebCam / กำหนด Webcam เเละ ดึง Model 
 face_detector = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
@@ -40,7 +40,8 @@ if not os.path.isdir('static/faces'):
     os.makedirs('static/faces')
 if f'Attendance-{datetoday}.csv' not in os.listdir('Attendance'):
     with open(f'Attendance/Attendance-{datetoday}.csv','w') as f:
-        f.write('ref_teacher_id, ref_s_id, ref_std_id, check_in_date, date_save')
+        # f.write('ref_teacher_id, ref_s_id, ref_std_id, check_in_date, date_save')
+        f.write('teacher id,subject id,student id,check in date,date')
 
 #### get a number of total registered users / รับจำนวนผู้ใช้ที่ลงทะเบียนทั้งหมด
 def totalreg():
@@ -83,15 +84,44 @@ def extract_attendance():
     return names,rolls,times,l
 
 #### Add Attendance of a specific user / เพิ่มการเข้าร่วมของผู้ใช้เฉพาะ
-def add_attendance(name):
+def add_attendance(name, s_id, checkin_date):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+
     username = name.split('_')[0]
     userid = name.split('_')[1]
-    current_time = datetime.now().strftime("%H:%M:%S")
-    
+    current_time = datetime.now()
+
+    cursor.execute("SELECT s.*, std.* FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id\
+                   LEFT JOIN student as std ON e.ref_std_id = std.std_id\
+                   WHERE std.username = %s and s.s_id = %s and std.std_id = %s\
+                   GROUP BY s.s_id", (name, s_id, userid))
+    enroll_check = cursor.fetchone()
+    print(enroll_check)
+    teacher_id = enroll_check['ref_teacher_id']
+    std_id = enroll_check['std_id']
+
+    checkin_time = datetime.now().strftime("%H:%M:%S")
+    in_time = enroll_check['start_time']
+
+    if checkin_time <= in_time:
+        checkin_status = 1
+    elif checkin_time > in_time:
+        checkin_status = 2
+    else:
+        checkin_status = 0
+
+    if enroll_check:
+        cursor.execute("INSERT INTO checkin (ref_teacher_id, ref_s_id, ref_std_id, check_in_status, check_in_date, date_save)\
+                        VALUES (%s,%s,%s,%s,%s,%s)", (enroll_check['ref_teacher_id'], s_id, enroll_check['std_id'], checkin_status, checkin_date, current_time))
+        msg = f'เช็คชื่อวันที่ {checkin_date} เรียบร้อยแล้ว'
+
     df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
-    if int(userid) not in list(df['Roll']):
+    if int(userid) not in list(df['รหัสนักศึกษา']):
         with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
-            f.write(f'\n{username},{userid},{current_time}')
+            f.write(f'\n{teacher_id},{s_id},{std_id},{checkin_date},{current_time}')
+    
+    return msg
 
 # -------------------------- Content -------------------------- #
 
@@ -272,7 +302,7 @@ def THome():
         session['data'] = cursor.fetchall()
         data = session['data']
         print('data :',data[0])
-        return render_template("/teacher/index.html", user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
+        return render_template("/teacher/index.html", today_date=datetoday2, user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for('Login'))
 
 @app.route("/teacher/edit/<id>", methods=['GET','POST'])
@@ -357,6 +387,35 @@ def AddSubject():
             return render_template("/teacher/addsubject.html", msg=msg, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
         return render_template("/teacher/addsubject.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
+
+@app.route('/teacher/checkin/<s_id>/<checkin_date>',methods=['GET','POST'])
+def Checkin(s_id, checkin_date):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    data = session['data']
+    teacher_id = session['teacher_id']
+
+    if 'face_recognition_model.pkl' not in os.listdir('static'):
+        return render_template('index.html',msg='ยังไม่มีข้อมูลใบหน้าใน model')
+    
+    cap = cv2.VideoCapture(0)
+    ret = True
+    while ret:
+        ret, frame = cap.read()
+        if extract_faces(frame) != ():
+            (x,y,w,h) = extract_faces(frame)[0]
+            cv2.rectangle(frame,(x,y), (x+w, y+h), (255, 0, 20), 2)
+            face = cv2.resize(frame[y:y+h,x:x+w], (50, 50))
+            identified_person = identify_face(face.reshape(1,-1))[0]
+            msg = add_attendance(identified_person, s_id, checkin_date)
+        cv2.imshow('Attendance', frame)
+        if cv2.waitKey(1)& 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+    return render_template("/teacher/index.html", msg=msg, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+
+
 
 @app.route("/teacher/checkinHistory/<s_id>", methods=['GET','POST'])
 def CheckinHist(s_id):
