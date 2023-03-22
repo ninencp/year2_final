@@ -101,10 +101,11 @@ def add_attendance(name, s_id, checkin_date):
     teacher_id = enroll_check['ref_teacher_id']
     std_id = enroll_check['std_id']
 
-    checkin_time = datetime.now().strftime("%H:%M:%S")
+    checkin_time_str = datetime.now().strftime("%H:%M:%S")
+    checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S").time()
     in_time = enroll_check['start_time']
-    print(type(checkin_time))
-    print(type(in_time))
+    print(type(checkin_time), checkin_time)
+    print(in_time)
 
     if checkin_time <= in_time:
         checkin_status = 1
