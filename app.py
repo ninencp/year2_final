@@ -447,7 +447,10 @@ def CheckinHist(s_id):
         cursor.execute("SELECT check_in_date FROM checkin WHERE ref_s_id=%s AND ref_teacher_id=%s GROUP BY check_in_date", (s_id ,teacher_id))
         hist = cursor.fetchall()
         print(hist)
-        return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+        cursor.execute("SELECT s_id,s_name FROM subject WHERE s_id=%s", (s_id))
+        subject = cursor.fetchone()
+        print(subject)
+        return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for('Login'))
 
 @app.route("/teacher/checkDetailbyDate/<date>/<s_id>", methods=['GET','POST'])
@@ -467,11 +470,14 @@ def CheckDetailbyDate(date, s_id):
                        (s_id, date))
         checkin_data = cursor.fetchall()
         print(checkin_data)
+        cursor.execute("SELECT s_id,s_name FROM subject WHERE s_id=%s", (s_id))
+        subject = cursor.fetchone()
+        print(subject)
 
         #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
         if len(checkin_data) < 1:
             return redirect(url_for('THome'))
-        return render_template("/teacher/checkin_hist_view.html", late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+        return render_template("/teacher/checkin_hist_view.html", subject=subject, late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
 
 
 
