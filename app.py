@@ -117,12 +117,13 @@ def add_attendance(name, s_id, checkin_date):
     if enroll_check and not check_exist:
 
         in_time = enroll_check['start_time']
+        out_time = enroll_check['end_time']
 
         if checkin_time <= in_time:
             checkin_status = 1
-        elif checkin_time > in_time:
+        elif checkin_time > in_time and checkin_time < out_time:
             checkin_status = 2
-        else:
+        elif checkin_time > in_time and checkin_time > out_time:
             checkin_status = 0
             
         print(checkin_date)
