@@ -91,7 +91,12 @@ def add_attendance(name, s_id, checkin_date):
 
     username = name.split('_')[0]
     userid = name.split('_')[1]
+    cursor.execute("SELECT username from student WHERE std_id = %s", (userid))
+    fetch_username = cursor.fetchone()
+    username = fetch_username['username']
     current_time = datetime.now()
+
+    print('user :',username,'id :',userid,'s_id :', s_id)
 
     checkin_date = datetime.strptime(checkin_date, '%d-%m-%Y').date()
 
@@ -100,8 +105,7 @@ def add_attendance(name, s_id, checkin_date):
                    WHERE std.username = %s and s.s_id = %s and std.std_id = %s\
                    GROUP BY s.s_id", (username, s_id, userid))
     enroll_check = cursor.fetchone()
-    teacher_id = enroll_check['ref_teacher_id']
-    std_id = enroll_check['std_id']
+    print(enroll_check)
 
     cursor.execute("SELECT * from checkin WHERE ref_std_id = %s AND ref_s_id = %s AND check_in_date = %s", (userid, s_id, checkin_date))
     check_exist = cursor.fetchone()
@@ -109,16 +113,18 @@ def add_attendance(name, s_id, checkin_date):
     checkin_time_str = datetime.now().strftime("%H:%M:%S")
     checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S")
     checkin_time = timedelta(hours=checkin_time.hour, minutes=checkin_time.minute, seconds=checkin_time.second)
-    in_time = enroll_check['start_time']
-
-    if checkin_time <= in_time:
-        checkin_status = 1
-    elif checkin_time > in_time:
-        checkin_status = 2
-    else:
-        checkin_status = 0
 
     if enroll_check and not check_exist:
+
+        in_time = enroll_check['start_time']
+
+        if checkin_time <= in_time:
+            checkin_status = 1
+        elif checkin_time > in_time:
+            checkin_status = 2
+        else:
+            checkin_status = 0
+            
         print(checkin_date)
         cursor.execute("INSERT INTO checkin (ref_teacher_id, ref_s_id, ref_std_id, check_in_status, check_in_date, date_save)\
                         VALUES (%s,%s,%s,%s,%s,%s)", (enroll_check['ref_teacher_id'], s_id, enroll_check['std_id'], checkin_status, checkin_date, current_time))
@@ -192,7 +198,7 @@ def Register_std():
                     break
             cap.release()
             cv2.destroyAllWindows()
-            train_model()        
+            train_model()
 
     elif request.method == "POST":
         msg = 'Please fill out the form'
@@ -384,7 +390,7 @@ def AddSubject():
 
             if subject_check:
                 msg = 'คุณเคยเพิ่มรายวิชานี้ไปแล้ว'
-            elif subject_check and subject_id != '' and subject != '' and start != '' and end != '':
+            elif not subject_check and subject_id != '' and subject != '' and start != '' and end != '':
                 cursor.execute("INSERT INTO subject (s_id, s_name, start_time, end_time, ref_teacher_id) VALUES (%s,%s,%s,%s,%s)", (subject_id, subject, start, end, teacher_id))
                 db.commit()
                 msg = 'เพิ่มรายวิชาเรียบร้อย'
@@ -530,6 +536,19 @@ def UpdateStd(id):
                         WHERE std_id = %s\
                         ", (name, username, id))
             db.commit()
+
+            old_imgfolder = 'static/faces/'+session['username']+'_'+str(std_id)
+            cnt = 0    
+
+            for filename in os.listdir(old_imgfolder):
+                source = old_imgfolder + '/' + filename
+                dest = old_imgfolder + '/' + username + '_' + str(cnt) + ".jpg"
+                os.rename(source, dest)
+                cnt += 1
+
+            os.rename(old_imgfolder, "static/faces/"+username+'_'+str(id))
+            
+
             return redirect(url_for('Login'))
         elif request.method == 'POST' and 'password' in request.form and 'conf_pw' in request.form:
             password = request.form['password']
