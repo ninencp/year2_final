@@ -1,4 +1,4 @@
-import pymysql, re, cv2, os
+import pymysql, re, cv2, os, shutil
 
 from flask import (Flask, flash, redirect, render_template, request, session,
                    url_for)
@@ -152,6 +152,7 @@ def Register_std():
                     break
                 cv2.imshow('Adding student face', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
+                    shutil.rmtree(imagefolder)
                     break
             cap.release()
             cv2.destroyAllWindows()
