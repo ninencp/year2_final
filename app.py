@@ -664,11 +664,14 @@ def StdCheckDetailbyDate(date, s_id):
                        (s_id, date, std_id))
         checkin_data = cursor.fetchall()
         print(checkin_data)
+        cursor.execute("SELECT s_id,s_name FROM subject WHERE s_id=%s", (s_id))
+        subject = cursor.fetchone()
+        print(subject)
 
         #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
         if len(checkin_data) < 1:
             return redirect(url_for('StdHome'))
-        return render_template("/student/checkin_hist_view.html", late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,std_id=session['std_id'], std_name=session['std_name'], username=session['username'])
+        return render_template("/student/checkin_hist_view.html",subject=subject, late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,std_id=session['std_id'], std_name=session['std_name'], username=session['username'])
 
 # start app
 if __name__ == "__main__":

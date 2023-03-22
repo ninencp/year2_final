@@ -1,4 +1,4 @@
-{% extends "layout_teacher.html" %}
+{% extends "layout_std.html" %}
 {% block title %}Home{% endblock %}
 {% block class %}
 <a class="nav-link" href="{{url_for('StdHome')}}" style="color: white;">
@@ -22,6 +22,7 @@
                     <div class="row row-cols-auto">
                         <div class="col">
                             <h4>ประวัติการเช็คชื่อ</h4>
+                            <h5>{{subject.s_id}} {{subject.s_name}}</h5>
                             <span style="color: orangered;">วันที่ : {{date}}</span>
                         </div>
                     </div>
