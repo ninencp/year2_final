@@ -98,7 +98,6 @@ def add_attendance(name, s_id, checkin_date):
                    WHERE std.username = %s and s.s_id = %s and std.std_id = %s\
                    GROUP BY s.s_id", (username, s_id, userid))
     enroll_check = cursor.fetchone()
-    print(enroll_check)
     teacher_id = enroll_check['ref_teacher_id']
     std_id = enroll_check['std_id']
 
@@ -106,8 +105,6 @@ def add_attendance(name, s_id, checkin_date):
     checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S")
     checkin_time = timedelta(hours=checkin_time.hour, minutes=checkin_time.minute, seconds=checkin_time.second)
     in_time = enroll_check['start_time']
-    print(type(checkin_time), checkin_time)
-    print(in_time)
 
     if checkin_time <= in_time:
         checkin_status = 1
@@ -119,14 +116,12 @@ def add_attendance(name, s_id, checkin_date):
     if enroll_check:
         cursor.execute("INSERT INTO checkin (ref_teacher_id, ref_s_id, ref_std_id, check_in_status, check_in_date, date_save)\
                         VALUES (%s,%s,%s,%s,%s,%s)", (enroll_check['ref_teacher_id'], s_id, enroll_check['std_id'], checkin_status, checkin_date, current_time))
-        msg = f'เช็คชื่อวันที่ {checkin_date} เรียบร้อยแล้ว'
+        db.commit()
 
     df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
     if int(userid) not in list(df['student id']):
         with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
             f.write(f'\n{teacher_id},{s_id},{std_id},{checkin_date},{current_time}')
-    
-    return msg
 
 # -------------------------- Content -------------------------- #
 
@@ -305,9 +300,10 @@ def THome():
         t_id = session['teacher_id']
         cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (t_id))
         session['data'] = cursor.fetchall()
+        session['date'] = datetoday2
         data = session['data']
         print('data :',data[0])
-        return render_template("/teacher/index.html", today_date=datetoday2, user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
+        return render_template("/teacher/index.html", today_date=session['date'], user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for('Login'))
 
 @app.route("/teacher/edit/<id>", methods=['GET','POST'])
@@ -393,8 +389,8 @@ def AddSubject():
         return render_template("/teacher/addsubject.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
 
-@app.route('/teacher/checkin/<s_id>/<checkin_date>',methods=['GET','POST'])
-def Checkin(s_id, checkin_date):
+@app.route('/teacher/checkin/<s_id>/<today_date>',methods=['GET','POST'])
+def Checkin(s_id, today_date):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['data']
@@ -402,6 +398,7 @@ def Checkin(s_id, checkin_date):
     cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
     subject = cursor.fetchall()
     print(subject)
+    print('checkindate :',today_date)
 
     if 'face_recognition_model.pkl' not in os.listdir('static'):
         return render_template('index.html',msg='ยังไม่มีข้อมูลใบหน้าใน model')
@@ -415,13 +412,15 @@ def Checkin(s_id, checkin_date):
             cv2.rectangle(frame,(x,y), (x+w, y+h), (255, 0, 20), 2)
             face = cv2.resize(frame[y:y+h,x:x+w], (50, 50))
             identified_person = identify_face(face.reshape(1,-1))[0]
-            msg = add_attendance(identified_person, s_id, checkin_date)
+            # add_attendance(identified_person, s_id, today_date)
+            cv2.putText(frame,f'{identified_person}',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
         cv2.imshow('Attendance', frame)
         if cv2.waitKey(1)& 0xFF == ord('q'):
+            add_attendance(identified_person, s_id, today_date)
             break
     cap.release()
     cv2.destroyAllWindows()
-    return render_template("/teacher/index.html", msg=msg, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+    return render_template("/teacher/index.html", today_date=today_date, user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
 
 
 
