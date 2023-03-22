@@ -95,7 +95,7 @@ def add_attendance(name, s_id, checkin_date):
     cursor.execute("SELECT s.*, std.* FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id\
                    LEFT JOIN student as std ON e.ref_std_id = std.std_id\
                    WHERE std.username = %s and s.s_id = %s and std.std_id = %s\
-                   GROUP BY s.s_id", (name, s_id, userid))
+                   GROUP BY s.s_id", (username, s_id, userid))
     enroll_check = cursor.fetchone()
     print(enroll_check)
     teacher_id = enroll_check['ref_teacher_id']
@@ -103,6 +103,8 @@ def add_attendance(name, s_id, checkin_date):
 
     checkin_time = datetime.now().strftime("%H:%M:%S")
     in_time = enroll_check['start_time']
+    print(type(checkin_time))
+    print(type(in_time))
 
     if checkin_time <= in_time:
         checkin_status = 1
