@@ -93,6 +93,8 @@ def add_attendance(name, s_id, checkin_date):
     userid = name.split('_')[1]
     current_time = datetime.now()
 
+    checkin_date = datetime.strptime(checkin_date, '%d-%m-%Y').date()
+
     cursor.execute("SELECT s.*, std.* FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id\
                    LEFT JOIN student as std ON e.ref_std_id = std.std_id\
                    WHERE std.username = %s and s.s_id = %s and std.std_id = %s\
@@ -100,6 +102,9 @@ def add_attendance(name, s_id, checkin_date):
     enroll_check = cursor.fetchone()
     teacher_id = enroll_check['ref_teacher_id']
     std_id = enroll_check['std_id']
+
+    cursor.execute("SELECT * from checkin WHERE ref_std_id = %s AND ref_s_id = %s AND check_in_date = %s", (userid, s_id, checkin_date))
+    check_exist = cursor.fetchone()
 
     checkin_time_str = datetime.now().strftime("%H:%M:%S")
     checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S")
@@ -113,15 +118,16 @@ def add_attendance(name, s_id, checkin_date):
     else:
         checkin_status = 0
 
-    if enroll_check:
+    if enroll_check and not check_exist:
+        print(checkin_date)
         cursor.execute("INSERT INTO checkin (ref_teacher_id, ref_s_id, ref_std_id, check_in_status, check_in_date, date_save)\
                         VALUES (%s,%s,%s,%s,%s,%s)", (enroll_check['ref_teacher_id'], s_id, enroll_check['std_id'], checkin_status, checkin_date, current_time))
         db.commit()
 
-    df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
-    if int(userid) not in list(df['student id']):
-        with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
-            f.write(f'\n{teacher_id},{s_id},{std_id},{checkin_date},{current_time}')
+    # df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
+    # if int(userid) not in list(df['student id']):
+    #     with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
+    #         f.write(f'\n{teacher_id},{s_id},{std_id},{checkin_date},{current_time}')
 
 # -------------------------- Content -------------------------- #
 
@@ -398,11 +404,11 @@ def Checkin(s_id, today_date):
     cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
     subject = cursor.fetchall()
     print(subject)
-    print('checkindate :',today_date)
 
     if 'face_recognition_model.pkl' not in os.listdir('static'):
         return render_template('index.html',msg='ยังไม่มีข้อมูลใบหน้าใน model')
     
+    print('checkindate :',today_date, type(today_date))
     cap = cv2.VideoCapture(0)
     ret = True
     while ret:
@@ -420,6 +426,7 @@ def Checkin(s_id, today_date):
             break
     cap.release()
     cv2.destroyAllWindows()
+    print('stop')
     return render_template("/teacher/index.html", today_date=today_date, user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
 
 
@@ -452,7 +459,7 @@ def CheckDetailbyDate(date, s_id):
         cursor.execute("SELECT s.*, i.check_in_status, TIME(i.date_save) AS check_in_time, i.no FROM student AS s \
                        JOIN checkin AS i ON s.std_id=i.ref_std_id\
                        WHERE i.ref_s_id=%s AND i.check_in_date=%s\
-                       GROUP BY i.ref_std_id ORDER BY s.std_id DESC",
+                       GROUP BY i.ref_std_id ORDER BY check_in_time ASC",
                        (s_id, date))
         checkin_data = cursor.fetchall()
         print(checkin_data)
