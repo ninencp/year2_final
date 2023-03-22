@@ -1,4 +1,4 @@
-import pymysql, re, cv2, os, shutil
+import pymysql, re, cv2, os, shutil, time
 
 from flask import (Flask, flash, redirect, render_template, request, session,
                    url_for)
@@ -351,9 +351,8 @@ def AddSubject():
                 cursor.execute("INSERT INTO subject (s_id, s_name, start_time, end_time, ref_teacher_id) VALUES (%s,%s,%s,%s,%s)", (subject_id, subject, start, end, teacher_id))
                 db.commit()
                 msg = 'เพิ่มรายวิชาเรียบร้อย'
-
             return render_template("/teacher/addsubject.html", msg=msg, user=data[0])
-        return render_template("/teacher/addsubject.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+        # return render_template("/teacher/addsubject.html", user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))
 
 @app.route("/teacher/checkinHistory/<s_id>", methods=['GET','POST'])
