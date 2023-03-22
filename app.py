@@ -461,6 +461,9 @@ def CheckDetailbyDate(date, s_id):
     cursor.execute("SELECT start_time FROM subject WHERE s_id=%s",(s_id))
     late_check = cursor.fetchone()
     print(late_check)
+    totalCome = 0
+    totalLate = 0
+    totalMiss = 0
 
     if 'loggedin' in session and 'teacher' in session:
         cursor.execute("SELECT s.*, i.check_in_status, TIME(i.date_save) AS check_in_time, i.no FROM student AS s \
@@ -474,10 +477,18 @@ def CheckDetailbyDate(date, s_id):
         subject = cursor.fetchone()
         print(subject)
 
+        for i in checkin_data:
+            if i['check_in_status'] == 0:
+                totalMiss+=1
+            elif i['check_in_status'] == 1:
+                totalCome+=1
+            else:
+                totalLate+=1
+
         #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
         if len(checkin_data) < 1:
             return redirect(url_for('THome'))
-        return render_template("/teacher/checkin_hist_view.html", subject=subject, late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+        return render_template("/teacher/checkin_hist_view.html",totalCome=totalCome,totalLate=totalLate,totalMiss=totalMiss, subject=subject, late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
 
 
 

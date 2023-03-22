@@ -62,6 +62,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="card-footer" style="padding-top: 1%;">
+                    <h5 style="color: darkblue;">จำนวนนิสิตทั้งหมด {{checkin_data|length}} คน</h5>
+                    <h5 style="color: darkblue;">มาเรียน {{totalCome}} คน :: คิดเป็น {{ "%.0f" | format(totalCome/checkin_data|length*100)}}%</h5>
+                    <h5 style="color: darkblue;">มาสาย {{totalLate}} คน :: คิดเป็น {{"%.0f" | format(totalLate/checkin_data|length*100)}}%</h5>
+                    <h5 style="color: darkblue;">ขาดเรียน {{totalMiss}} คน :: คิดเป็น {{"%.0f" | format(totalMiss/checkin_data|length*100)}}%</h5>
+                </div>
             </div>
         </div>
     </div>
