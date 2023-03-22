@@ -447,7 +447,7 @@ def CheckinHist(s_id):
     if 'loggedin' in session and 'teacher' in session:
         print(s_id, teacher_id)
         cursor.execute("SELECT check_in_date FROM checkin WHERE ref_s_id=%s AND ref_teacher_id=%s GROUP BY check_in_date", (s_id ,teacher_id))
-        hist = cursor.fetchone()
+        hist = cursor.fetchall()
         print(hist)
         return render_template("/teacher/checkin_history.html", hist=hist, s_id=s_id, user=data[0],teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
     return redirect(url_for('Login'))

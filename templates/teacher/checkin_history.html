@@ -35,10 +35,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>{{hist.check_in_date}}</td>
-                                        <td><a type="button" class="btn btn-info btn-sm" href="/teacher/checkDetailbyDate/{{hist.check_in_date}}/{{s_id}}">ประวัติ</a></td>
-                                    </tr>
+                                    {% if hist%}
+                                        {% for row in hist %}
+                                            <tr>
+                                                <td>{{row.check_in_date}}</td>
+                                                <td><a type="button" class="btn btn-info btn-sm" href="/teacher/checkDetailbyDate/{{row.check_in_date}}/{{s_id}}">ประวัติ</a></td>
+                                            </tr>
+                                        {% endfor %}       
+                                    {% else %}
+                                        <tr>
+                                            <td>ยังไม่มีประวัติการเช็คชื่อ</td>
+                                            <td>-</td>
+                                        </tr>             
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>
