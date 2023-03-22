@@ -1,0 +1,59 @@
+{% extends "layout_std.html" %}
+{% block title %}Home{% endblock %}
+{% block class %}
+<a class="nav-link" href="{{url_for('StdHome')}}" style="color: white;">
+    <div class="sb-nav-link-icon" style="color: white;"><i class="fas fa-user"></i></div>
+    <span>{{std_name}}</span>
+</a>
+<a class="nav-link" href="/student/edit/{{std_id}}">
+    <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
+    <span>แก้ไขข้อมูลส่วนตัว</span>
+</a>
+<a class="nav-link" href="#">
+    <div class="sb-nav-link-icon"><i class="fa-solid fa-chart-line"></i></i></div>
+    <span>Dashboard</span>
+</a>
+{% endblock %}
+{% block body %}
+    <div id="layoutSidenav_content">
+        <div class="container-fluid">
+            <div class="card" style="margin-top: 2%;">
+                <div class="card-header">
+                    <div class="row row-cols-auto">
+                        <div class="col"><h4>ประวัติการเช็คชื่อ</h4></div>
+                    </div>
+                    
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
+                                <thead>
+                                    <tr class="table-info">
+                                        <th>วันที่ (ปี-เดือน-วัน)</th>
+                                        <th>ประวัติการเข้าเรียน</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if hist%}
+                                        {% for row in hist %}
+                                            <tr>
+                                                <td>{{row.check_in_date}}</td>
+                                                <td><a type="button" class="btn btn-info btn-sm" href="/student/checkDetailbyDate/{{row.check_in_date}}/{{s_id}}">ประวัติ</a></td>
+                                            </tr>
+                                        {% endfor %}       
+                                    {% else %}
+                                        <tr>
+                                            <td>ยังไม่มีประวัติการเช็คชื่อ</td>
+                                            <td>-</td>
+                                        </tr>             
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

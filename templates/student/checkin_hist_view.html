@@ -1,0 +1,67 @@
+{% extends "layout_teacher.html" %}
+{% block title %}Home{% endblock %}
+{% block class %}
+<a class="nav-link" href="{{url_for('StdHome')}}" style="color: white;">
+    <div class="sb-nav-link-icon" style="color: white;"><i class="fas fa-user"></i></div>
+    <span>{{std_name}}</span>
+</a>
+<a class="nav-link" href="/student/edit/{{std_id}}">
+    <div class="sb-nav-link-icon"><i class="fa-solid fa-address-card"></i></div>
+    <span>แก้ไขข้อมูลส่วนตัว</span>
+</a>
+<a class="nav-link" href="#">
+    <div class="sb-nav-link-icon"><i class="fa-solid fa-chart-line"></i></i></div>
+    <span>Dashboard</span>
+</a>
+{% endblock %}
+{% block body %}
+    <div id="layoutSidenav_content">
+        <div class="container-fluid">
+            <div class="card" style="margin-top: 2%;">
+                <div class="card-header">
+                    <div class="row row-cols-auto">
+                        <div class="col">
+                            <h4>ประวัติการเช็คชื่อ</h4>
+                            <span style="color: orangered;">วันที่ : {{date}}</span>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
+                                <thead>
+                                    <tr class="table-info">
+                                        <th width="20%">รหัสนิสิต</th>
+                                        <th width="20%">ชื่อ</th>
+                                        <th width="20%">เวลาเริ่มเรียน</th>
+                                        <th width="20%">เวลาเข้าเรียน</th>
+                                        <th width="20%">สรุป</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in checkin_data %}
+                                        <tr>
+                                            <td>{{row.std_id}}</td>
+                                            <td>{{row.std_name}}</td>
+                                            <td>{{late_check.start_time}}</td>
+                                            <td>{{row.check_in_time}}</td>
+                                            {% if row.check_in_status == 0 %}
+                                                <td>ขาด</td>
+                                            {% elif row.check_in_status == 1 %}
+                                                <td>มา</td>
+                                            {% elif row.check_in_status == 2 %}
+                                                <td>สาย</td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

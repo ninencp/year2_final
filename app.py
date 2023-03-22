@@ -435,8 +435,6 @@ def Checkin(s_id, today_date):
     print('stop')
     return render_template("/teacher/index.html", today_date=today_date, user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
 
-
-
 @app.route("/teacher/checkinHistory/<s_id>", methods=['GET','POST'])
 def CheckinHist(s_id):
     db = mysql.connect()
@@ -496,12 +494,15 @@ def StdHome():
     cursor = db.cursor(pymysql.cursors.DictCursor)
     std_id = session['std_id']
     if 'loggedin' in session and 'std' in session:
+        cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
+        subject = cursor.fetchall()
+        print(subject)
         cursor.execute("SELECT subject.s_name, ref_s_id FROM subject INNER JOIN enroll ON subject.s_id=ref_s_id WHERE enroll.ref_std_id=%s", (std_id))
         enroll = cursor.fetchall()
         cursor.execute("SELECT * FROM student WHERE std_id = %s", (std_id))
         session['std_data'] = cursor.fetchall()
         data = session['std_data']
-        return render_template("/student/index.html", user=data[0], std_id=std_id, std_name=session['std_name'], username=session['username'], enroll=enroll)
+        return render_template("/student/index.html", user=data[0], std_id=std_id, std_name=session['std_name'], username=session['username'], enroll=enroll, subject=subject)
     return redirect(url_for('Login'))    
 
 @app.route("/student/edit/<id>", methods=['GET','POST'])
@@ -609,6 +610,45 @@ def Detail(id):
             return render_template("/student/detail.html", msg=msg, user=data[0], subject=subject,std_id=std_id, std_name=session['std_name'], username=session['username'])
         return render_template("/student/detail.html", user=data[0], subject=subject,std_id=std_id, std_name=session['std_name'], username=session['username'])
     return redirect(url_for('Login'))
+
+@app.route("/student/checkinHistory/<s_id>", methods=['GET','POST'])
+def StdCheckinHist(s_id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    data = session['data']
+    std_id = session['std_id']
+
+    if 'loggedin' in session and 'std' in session:
+        print(s_id, std_id)
+        cursor.execute("SELECT check_in_date FROM checkin WHERE ref_s_id=%s AND ref_std_id=%s GROUP BY check_in_date", (s_id ,std_id))
+        hist = cursor.fetchall()
+        print(hist)
+        return render_template("/student/checkin_history.html", hist=hist, s_id=s_id, user=data[0],std_id=session['std_id'], std_name=session['std_name'], username=session['username'])
+    return redirect(url_for('Login'))
+
+@app.route("/student/checkDetailbyDate/<date>/<s_id>", methods=['GET','POST'])
+def StdCheckDetailbyDate(date, s_id):
+    db = mysql.connect()
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    data = session['data']
+    std_id = session['std_id']
+    cursor.execute("SELECT start_time FROM subject WHERE s_id=%s",(s_id))
+    late_check = cursor.fetchone()
+    print(late_check)
+
+    if 'loggedin' in session and 'std' in session:
+        cursor.execute("SELECT s.*, i.check_in_status, TIME(i.date_save) AS check_in_time, i.no FROM student AS s \
+                       JOIN checkin AS i ON s.std_id=i.ref_std_id\
+                       WHERE i.ref_s_id=%s AND i.check_in_date=%s AND s.std_id = %s\
+                       GROUP BY i.ref_std_id ORDER BY check_in_time ASC",
+                       (s_id, date, std_id))
+        checkin_data = cursor.fetchall()
+        print(checkin_data)
+
+        #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
+        if len(checkin_data) < 1:
+            return redirect(url_for('StdHome'))
+        return render_template("/student/checkin_hist_view.html", late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,std_id=session['std_id'], std_name=session['std_name'], username=session['username'])
 
 # start app
 if __name__ == "__main__":
