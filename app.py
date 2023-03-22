@@ -476,6 +476,9 @@ def CheckDetailbyDate(date, s_id):
         cursor.execute("SELECT s_id,s_name FROM subject WHERE s_id=%s", (s_id))
         subject = cursor.fetchone()
         print(subject)
+        cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id WHERE s.s_id=%s GROUP BY s.s_id ORDER BY s.s_id DESC",(s_id))
+        subject2 = cursor.fetchone()
+        print(subject2)
 
         for i in checkin_data:
             if i['check_in_status'] == 0:
@@ -488,7 +491,7 @@ def CheckDetailbyDate(date, s_id):
         #กรณีดึงข้อมูลไม่ได้ จะกลับไปยังหน้าหลัก
         if len(checkin_data) < 1:
             return redirect(url_for('THome'))
-        return render_template("/teacher/checkin_hist_view.html",totalCome=totalCome,totalLate=totalLate,totalMiss=totalMiss, subject=subject, late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
+        return render_template("/teacher/checkin_hist_view.html",subject2=subject2,totalCome=totalCome,totalLate=totalLate,totalMiss=totalMiss, subject=subject, late_check=late_check, user=data[0], s_id=s_id, date=date, checkin_data=checkin_data,teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'])
 
 
 
