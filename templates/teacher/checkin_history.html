@@ -41,8 +41,8 @@
                                     {% if hist%}
                                         {% for row in hist %}
                                             <tr>
-                                                <td>{{row.check_in_date}}</td>
-                                                <td><a type="button" class="btn btn-info btn-sm" href="/teacher/checkDetailbyDate/{{row.check_in_date}}/{{s_id}}">ประวัติ</a></td>
+                                                <td>{{row.a}}</td>
+                                                <td><a type="button" class="btn btn-info btn-sm" href="/teacher/checkDetailbyDate/{{row.a}}/{{s_id}}">ประวัติ</a></td>
                                             </tr>
                                         {% endfor %}       
                                     {% else %}

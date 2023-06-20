@@ -1,4 +1,5 @@
 import pymysql, re, cv2, os, shutil, time
+from pathlib import Path
 
 from flask import (Flask, flash, redirect, render_template, request, session,
                    url_for)
@@ -11,6 +12,15 @@ from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
 import joblib
 
+import servo
+import RPi.GPIO as GPIO
+import pigpio
+import time
+
+import keyboard
+
+servo_pin = 17 #BCM
+
 app = Flask(__name__)
 app.secret_key = 'buu-iot'
 
@@ -18,12 +28,18 @@ mysql = MySQL()
 
 #MySQL Configuration
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_PASSWORD'] = '123'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost' 
 app.config['MYSQL_DATABASE_DB'] = 'iot_project'
-mysql.init_app(app)
+mysql.init_app(app) 
 
 # -------------------------- Function -------------------------- #
+
+### servo
+pwm = pigpio.pi()
+pwm.set_mode(servo_pin, pigpio.OUTPUT)
+pwm.set_PWM_frequency( servo_pin, 50 )
+
 
 #### Saving Date today in 2 different formats / บันทึกวันที่วันนี้ใน 2 รูปแบบที่แตกต่างกัน
 datetoday = date.today().strftime("%d_%m_%y")
@@ -32,7 +48,7 @@ datetoday2 = date.today().strftime("%d-%m-%Y")
 #### Initializing VideoCapture object to access WebCam / กำหนด Webcam เเละ ดึง Model 
 face_detector = cv2.CascadeClassifier('static/haarcascade_frontalface_default.xml')
 eye_detector = cv2.CascadeClassifier('static/haarcascade_eye_tree_eyeglasses.xml')
-cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(0)
 
 #### If these directories don't exist, create them / หากไม่มีไดเร็กทอรีเหล่านี้ ให้สร้างขึ้นใหม่ "สร้างโฟลเดอร์หน้า"
 if not os.path.isdir('Attendance'):
@@ -105,14 +121,17 @@ def add_attendance(name, s_id, checkin_date):
                    WHERE std.username = %s and s.s_id = %s and std.std_id = %s\
                    GROUP BY s.s_id", (username, s_id, userid))
     enroll_check = cursor.fetchone()
-    print(enroll_check)
+    print('enroll check:',enroll_check)
 
     cursor.execute("SELECT * from checkin WHERE ref_std_id = %s AND ref_s_id = %s AND check_in_date = %s", (userid, s_id, checkin_date))
     check_exist = cursor.fetchone()
 
     checkin_time_str = datetime.now().strftime("%H:%M:%S")
+    print(checkin_time_str)
     checkin_time = datetime.strptime(checkin_time_str, "%H:%M:%S")
+    print('first:',checkin_time)
     checkin_time = timedelta(hours=checkin_time.hour, minutes=checkin_time.minute, seconds=checkin_time.second)
+    print('second:',checkin_time)
 
     if enroll_check and not check_exist:
 
@@ -307,15 +326,15 @@ def THome():
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     if 'loggedin' in session and 'teacher' in session:
-        cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
-        subject = cursor.fetchall()
-        print(subject)
         t_id = session['teacher_id']
         cursor.execute("SELECT * FROM teacher WHERE teacher_id = %s", (t_id))
         session['data'] = cursor.fetchall()
         session['date'] = datetoday2
         data = session['data']
         print('data :',data[0])
+        cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id WHERE ref_teacher_id = %s GROUP BY s.s_id ORDER BY s.s_id DESC", (t_id))
+        subject = cursor.fetchall()
+        print(subject)
         return render_template("/teacher/index.html", today_date=session['date'], user=data[0], teacher_id=session['teacher_id'], teacher_name=session['teacher_name'], username=session['username'], subject=subject)
     return redirect(url_for('Login'))
 
@@ -408,7 +427,7 @@ def Checkin(s_id, today_date):
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['data']
     teacher_id = session['teacher_id']
-    cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id GROUP BY s.s_id ORDER BY s.s_id DESC")
+    cursor.execute("SELECT s.*, COUNT(ref_std_id) as totalstd FROM subject as s LEFT JOIN enroll as e ON s.s_id = e.ref_s_id WHERE ref_teacher_id = %s GROUP BY s.s_id ORDER BY s.s_id DESC", (teacher_id))
     subject = cursor.fetchall()
     print(subject)
 
@@ -420,6 +439,7 @@ def Checkin(s_id, today_date):
     ret = True
     while ret:
         ret, frame = cap.read()
+        print(extract_faces(frame))
         if extract_faces(frame) != ():
             (x,y,w,h) = extract_faces(frame)[0]
             cv2.rectangle(frame,(x,y), (x+w, y+h), (255, 0, 20), 2)
@@ -427,10 +447,13 @@ def Checkin(s_id, today_date):
             identified_person = identify_face(face.reshape(1,-1))[0]
             # add_attendance(identified_person, s_id, today_date)
             cv2.putText(frame,f'{identified_person}',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
-        cv2.imshow('Attendance', frame)
+            cv2.imshow('Attendance', frame)
+            servo.cam_move(servo_pin)
+        
         if cv2.waitKey(1)& 0xFF == ord('q'):
             add_attendance(identified_person, s_id, today_date)
             break
+
     cap.release()
     cv2.destroyAllWindows()
     print('stop')
@@ -445,7 +468,7 @@ def CheckinHist(s_id):
 
     if 'loggedin' in session and 'teacher' in session:
         print(s_id, teacher_id)
-        cursor.execute("SELECT check_in_date FROM checkin WHERE ref_s_id=%s AND ref_teacher_id=%s GROUP BY check_in_date", (s_id ,teacher_id))
+        cursor.execute("SELECT DATE(check_in_date) as a FROM checkin WHERE ref_s_id=%s AND ref_teacher_id=%s GROUP BY check_in_date", (s_id ,teacher_id))
         hist = cursor.fetchall()
         print(hist)
         cursor.execute("SELECT s_id,s_name FROM subject WHERE s_id=%s", (s_id))
@@ -459,7 +482,7 @@ def CheckDetailbyDate(date, s_id):
     db = mysql.connect()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     data = session['data']
-    cursor.execute("SELECT start_time FROM subject WHERE s_id=%s",(s_id))
+    cursor.execute("SELECT start_time,end_time FROM subject WHERE s_id=%s",(s_id))
     late_check = cursor.fetchone()
     print(late_check)
     totalCome = 0

@@ -34,11 +34,12 @@
                             <table id="subject_tbl" class="table table-bordered table-striped" style="text-align: center;">
                                 <thead>
                                     <tr class="table-info">
-                                        <th width="20%">รหัสนิสิต</th>
-                                        <th width="20%">ชื่อ</th>
-                                        <th width="20%">เวลาเริ่มเรียน</th>
-                                        <th width="20%">เวลาเข้าเรียน</th>
-                                        <th width="20%">สรุป</th>
+                                        <th>รหัสนิสิต</th>
+                                        <th>ชื่อ</th>
+                                        <th>เวลาเริ่มเรียน</th>
+                                        <th>เวลาเลิกเรียน</th>
+                                        <th>เวลาเข้าเรียน</th>
+                                        <th>สรุป</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -47,6 +48,7 @@
                                             <td>{{row.std_id}}</td>
                                             <td>{{row.std_name}}</td>
                                             <td>{{late_check.start_time}}</td>
+                                            <td>{{late_check.end_time}}</td>
                                             <td>{{row.check_in_time}}</td>
                                             {% if row.check_in_status == 0 %}
                                                 <td>ขาด</td>
